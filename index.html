@@ -21,15 +21,26 @@
     </div>
     
     <div id="section2">
+        <div id="play">
+            <h2 id="play-text">play</h2>
+            <button id="play-button" onclick="playButtonClicked(this)">Play</button>
+        </div>
         <div id="shift">
             <h2 id="shift-text">shift-amount</h2>
             <input type="range" id="shift-range" min="-12" max="12" value="0" step="0.1">
-            <p id="shift-value">0</p>
+            <p id="shift-display">0</p>
         </div>
-        <div id="play">
-            <h2 id="play-text">play</h2>
-            <button id="play-button">Play</button>
+        <div id="wet-dry">
+            <h2 id="wet-dry-text">wet/dry mix</h2>
+            <input type="range" id="wet-dry-slider" min="0" max="1" value="0.0" step="0.001" oninput="wetdryChanged(this)">
+            <p id="wet-dry-display">0.0</p>
         </div>
+        <div id="playback-rate">
+            <h2 id="playback-rate-text">playback rate</h2>
+            <input type="range" id="playback-rate-slider" min="0" max="5.0" value="1.0" step="0.01" oninput="playbackRateSliderChanged(this)">
+            <input type="text" id="playback-rate-display" value="1.0" oninput="playbackRateTextInputChanged(this)">
+        </div>
+
         <script src="rnbo-helpers.js"></script>
         <script src="main.js"></script>
     </body>

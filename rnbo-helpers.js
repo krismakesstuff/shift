@@ -1,7 +1,8 @@
 
 // This js file was made by Sam Tarakajian and is used to create a device and load the patcher from the exported json file.
 // As well as functions to play and stop notes.
-// https://youtu.be/l42_f9Ir8fQ?si=_1eSUs2Ipbc8S9cu
+// see: https://rnbo.cycling74.com/learn/loading-a-rnbo-device-in-the-browser-js
+// see: https://youtu.be/l42_f9Ir8fQ?si=_1eSUs2Ipbc8S9cu
 
 const patchExportURL = "rnbo-export/shift.export.json";
 
@@ -24,6 +25,7 @@ async function createRNBODevice(patchExportURL) {
             // Load RNBO script dynamically
             // Note that you can skip this by knowing the RNBO version of your patch
             // beforehand and just include it using a <script> tag
+            console.log("Loading RNBO script");
             await loadRNBOScript(patcher.desc.meta.rnboversion);
         }
 
@@ -48,6 +50,24 @@ async function createRNBODevice(patchExportURL) {
     } catch (err) {
         throw err;
     }
+
+    // Get the patcher's presets
+    let presets = patcher.presets || [];
+    if (presets.length < 1) {
+        console.log("No presets defined");
+    } else {
+        console.log(`Found ${presets.length} presets...`);
+        presets.forEach(preset => {
+            console.log(`preset ${preset.name}`);
+        });
+    }
+
+    // Prints out a list of the patcher's presets
+    // function loadPresetAtIndex(index) {
+    //     const preset = presets[index];
+    //     console.log(`Loading preset ${preset.name}`);
+    //     device.setPreset(preset.preset);
+    // }
 
     // Connect the device to the web audio graph
     device.node.connect(outputNode);
