@@ -8,50 +8,74 @@ async function setupRNBO() {
         console.log("Device not found");
     }
 
-    // // print out loaded device parameters
-    // console.log("Device found");
-    // device.parameters.forEach((parameter) => {
-    //     console.log(parameter.id);
-    //     console.log(parameter.name);
-    //     console.log(parameter.value);
-    // });
-    
-    // // set up event listeners for parameters
-    // const playstateParam = device.parametersById.get("playstate");
-    // playstateParam.changeEvent.subscribe((newPlayState) => {
-    //     console.log("playstate changed event, state: " + newPlayState);
-    // });
-
-
-    // const currentBeat = device.parametersById.get("beat");
-    // currentBeat.changeEvent.subscribe((newBeat) => {
-    //     sendStepToDevice();
-    //     setPlayhead();
-    //     currentStep = newBeat;
-    //     //console.log("current step: " + newBeat);
-    // });
-
-    // // load data buffer dependencies
-    // const descriptions = device.dataBufferDescriptions;
-    // descriptions.forEach((desc) => {
-    //     if(!!desc.file){
-    //         console.log("buffer with id: " + desc.id + " -references file: " + desc.file);
-    //     } else {
-    //         console.log(`buffer with id ${desc.id} references remote URL ${desc.url}`);
-    //     }});
-
-    // // Load the dependencies into the device
-    // const results = await device.loadDataBufferDependencies(descriptions);
-    // results.forEach(result => {
-    //     if (result.type === "success") {
-    //         console.log(`Successfully loaded buffer with id ${result.id}`);
-    //     } else {
-    //         console.log(`Failed to load buffer with id ${result.id}, ${result.error}`);
-    //     }    
-    // });
-
 }
 
 // We can't await here because it's top level, so we have to check later
 // if device and context have been assigned
 setupRNBO();
+
+
+let dropZone = document.getElementById("file-drop-area");
+
+dropZone.addEventListener("dragover", dragOverHandler, false);
+dropZone.addEventListener("drop", dropHandler, false);
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false)
+  })
+  
+function preventDefaults (e) {
+e.preventDefault()
+e.stopPropagation()
+}
+
+function dropHandler(ev) {
+    console.log("File(s) dropped");
+    
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+    
+    if (ev.dataTransfer.items) {
+        // Use DataTransferItemList interface to access the file(s)
+        [...ev.dataTransfer.items].forEach((item, i) => {
+            // If dropped items aren't files, reject them
+            if (item.kind === "file") {
+                const file = item.getAsFile();
+                console.log(`file found: file[${i}].name = ${file.name}`);
+                // check if file is audio file and insert audio player if it is
+                if(file.type.startsWith("audio")){
+                    insertAudioPlayer(file);
+                }
+                else{
+                    alert("Please drop an audio file");
+                }
+            }
+        });
+    } else {
+        // Use DataTransfer interface to access the file(s)
+        [...ev.dataTransfer.files].forEach((file, i) => {
+            
+            console.log(`not a file?? file[${i}].name = ${file.name}`);
+
+            
+        });
+    }
+}
+
+
+
+function dragOverHandler(ev) {
+    console.log("File(s) in drop zone");
+  
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+}
+
+// insert audio player with audio controls
+function insertAudioPlayer(audioFile){
+    console.log("inserting audio player");
+    let audioPlayer = document.createElement("audio");
+    audioPlayer.controls = true;
+    audioPlayer.src = URL.createObjectURL(audioFile);
+    dropZone.appendChild(audioPlayer);
+}
