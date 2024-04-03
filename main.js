@@ -1,14 +1,17 @@
 console.log('main.js');
 
 let bufferDescs;
-let buffer;
 
 const sampleRate = 44100;
 const numChans = 2;
 
+var droppedFile;
+var getDroppedFile = false;
+//let rnboDevice;
+
 // setup rnbo device
 async function setupRNBO() {
-    [device, context] = await createRNBODevice(patchExportURL);
+    [device, audioContext] = await createRNBODevice(patchExportURL);
     console.log("RNBO Device Created");
 
     if(!device) {
@@ -26,6 +29,7 @@ async function setupRNBO() {
         }
     });
     
+    //rnboDevice = [device, context];
     
 }
 
@@ -71,7 +75,12 @@ function dropHandler(ev) {
                 // check if file is audio file and insert audio player if it is
                 if(file.type.startsWith("audio")){
                     //insertAudioPlayer(file);
-                    loadAudioFile(file);
+                    
+                    //loadAudioFile(file);
+                    
+                    droppedFile = file;
+                    getDroppedFile = true;
+                    console.log("audio file dropped");
                 }
                 else{
                     alert("Please drop an audio file");
@@ -100,65 +109,48 @@ function insertAudioPlayer(audioFile){
 }
 
 
-let fileResponse, arrayBuf;
 
-// load dropped file into wetbuffer and drybuffer in rnbbo device
+// load file into wetbuffer and drybuffer in rnbbo device
 async function loadAudioFile(audioFile){
-    const audioFileURL = URL.createObjectURL(audioFile);
-    console.log("loading audio file");
-    buffer = await audioFile.arrayBuffer();
+    
+    var reader = new FileReader();
 
-    // go through buffer descriptions and load audio file using bufferids
-    bufferDescs.forEach((desc) => {
-        if(!!desc.file){
-            console.log("buffer with id: " + desc.id + " -references file: " + desc.file);
-        } else {
-            if(device){
-                console.log("device found");
-                //device.setDataBuffer(desc.id, buffer, numChans, sampleRate);
-                loadAudioFileIntoBuffer(audioFile, desc.id);
+    reader.onload = function(e) {
+        context.decodeAudioData(e.target.result).then(function(buffer) {
+            var source = context.createBufferSource();
+            source.buffer = buffer;
 
-                console.log("loaded buffer: " + desc.id + " with audio file: " + audioFile.name);
-            }
-        }
-    });
+            bufferDescs.forEach((desc) => {
+                if(!!desc.file){
+                    console.log("buffer with id: " + desc.id + " -references file: " + desc.file);
+                } else {
+                    if(device){
+        
+                        device.setDataBuffer(desc.id, buffer);
+                        console.log(`loaded audio file into buffer with id ${desc.id}`);
+        
+                    }
+                }
+            });
+            console.log("Decoded audio data from file" + buffer.length);
+
+        });
+    }
+
+    reader.readAsArrayBuffer(audioFile);
+
 
 }
 
-
-// load sample and buffer of dropped file into rnbo device data buffer by id
-async function loadAudioFileIntoBuffer(audioFile, bufferId){
-    console.log("loading audio file into buffer");
-
-    const audioFileURL = URL.createObjectURL(audioFile);
-    const fr = await fetch(audioFileURL);
-    buffer = await audioFile.arrayBuffer();
-    const audioBuf = await context.decodeAudioData(buffer);
-    
-    if(device){
-        await device.setDataBuffer(bufferId, buffer, numChans, sampleRate);
-
-        console.log("loaded buffer: " + bufferId + " with audio file: " + audioFile.name);
+// if getDropFile is true, load audio file into buffers
+function loadDroppedFile(){
+    if(getDroppedFile){
+        loadAudioFile(droppedFile);
+        getDroppedFile = false;
     }
 }
 
+// timer to check if file has been dropped
+setInterval(loadDroppedFile, 1000); 
 
 
-function makePresetSelectOption (preset) {
-    const select = document.getElementById('preset-select');
-    
-    const option = document.createElement('option');
-    option.setAttribute('id', preset.name);
-    option.value = preset.name;
-    option.innerText = preset.name;
-
-    select.appendChild(option);
-
-    //return option
-}
-
-function loadPresetAtIndex(index) {
-    const preset = presets[index];
-    console.log(`Loading preset ${preset.name}`);
-    device.setPreset(preset.preset);
-}

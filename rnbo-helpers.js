@@ -9,10 +9,11 @@ const patchExportURL = "rnbo-export/shift.export.json";
 let response, patcher;
 let presets;
 
+// Create AudioContext
+const WAContext = window.AudioContext || window.webkitAudioContext;
+const context = new WAContext();
+
 async function createRNBODevice(patchExportURL) {
-    // Create AudioContext
-    const WAContext = window.AudioContext || window.webkitAudioContext;
-    const context = new WAContext();
 
     // Create gain node and connect it to audio output
     const outputNode = context.createGain();
@@ -28,7 +29,6 @@ async function createRNBODevice(patchExportURL) {
             // Load RNBO script dynamically
             // Note that you can skip this by knowing the RNBO version of your patch
             // beforehand and just include it using a <script> tag
-            console.log("Loading RNBO script");
             await loadRNBOScript(patcher.desc.meta.rnboversion);
         }
 
@@ -38,7 +38,7 @@ async function createRNBODevice(patchExportURL) {
         };
         if (response && (response.status >= 300 || response.status < 200)) {
             errorContext.header = `Couldn't load patcher export bundle`,
-            errorContext.description = `Check to see what file it's trying to load. Currently it's` +
+            errorContext.description = `Check app.js to see what file it's trying to load. Currently it's` +
             ` trying to load "${patchExportURL}". If that doesn't` + 
             ` match the name of the file you exported from RNBO, modify` + 
             ` patchExportURL in app.js.`;
@@ -54,37 +54,36 @@ async function createRNBODevice(patchExportURL) {
         throw err;
     }
 
-    // Get the patcher's presets
-    presets = patcher.presets || [];
-    if (presets.length < 1) {
-        console.log("No presets defined");
-    } else {
-        console.log(`Found ${presets.length} presets...`);
-        presets.forEach(preset => {
-            console.log(`preset ${preset.name}`);
-        });
-    }
-
-    for(let i = 0; i < presets.length; i++) {
-        const preset = presets[i];
-        console.log(`Loading preset ${preset.name}`);
-        makePresetSelectOption(preset);
-        //device.setPreset(preset.preset);
-    }
-
-    // Prints out a list of the patcher's presets
-    // function loadPresetAtIndex(index) {
-    //     const preset = presets[index];
-    //     console.log(`Loading preset ${preset.name}`);
-    //     device.setPreset(preset.preset);
-    // }
-
     // Connect the device to the web audio graph
     device.node.connect(outputNode);
 
     document.body.onclick = () => {
         context.resume();
     }
+
+    presets = patcher.presets || [];
+    let defaultIndex= -1;
+    if (presets.length < 1) {
+        console.log("No presets defined");
+    } else {
+        console.log(`Found ${presets.length} presets...`);
+        
+        presets.forEach(preset => {
+            console.log(`preset ${preset.name}`);
+        });
+        
+        for(let i = 0; i < presets.length; i++) {
+            if(presets[i].name === "ping pong delay") {
+                defaultIndex = i;
+                break;
+            }
+        }
+        
+    }
+
+    device.setPreset(presets[defaultIndex].preset);
+
+    createPresetSelect(presets, presetSelected);
 
     return [device, context];
 }
