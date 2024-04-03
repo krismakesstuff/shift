@@ -33,7 +33,7 @@ async function setupRNBO() {
 // if device and context have been assigned
 setupRNBO();
 
-
+// File drop zone, adding and defining event listeners
 let dropZone = document.getElementById("file-drop-area");
 
 dropZone.addEventListener("dragover", dragOverHandler, false);
@@ -99,8 +99,12 @@ function insertAudioPlayer(audioFile){
     dropZone.appendChild(audioPlayer);
 }
 
+
+let fileResponse, arrayBuf;
+
 // load dropped file into wetbuffer and drybuffer in rnbbo device
 async function loadAudioFile(audioFile){
+    const audioFileURL = URL.createObjectURL(audioFile);
     console.log("loading audio file");
     buffer = await audioFile.arrayBuffer();
 
@@ -111,7 +115,9 @@ async function loadAudioFile(audioFile){
         } else {
             if(device){
                 console.log("device found");
-                device.setDataBuffer(desc.id, buffer, numChans, sampleRate);
+                //device.setDataBuffer(desc.id, buffer, numChans, sampleRate);
+                loadAudioFileIntoBuffer(audioFile, desc.id);
+
                 console.log("loaded buffer: " + desc.id + " with audio file: " + audioFile.name);
             }
         }
@@ -119,84 +125,40 @@ async function loadAudioFile(audioFile){
 
 }
 
-// playbutton callback
-function playButtonClicked(button){
-    console.log("play button clicked");
-    // get button state, change button textt
-    let buttonState;
-    if(button.innerHTML == "Play"){
-        buttonState = "Play";
-        button.innerHTML = "Stop";
-    } else {
-        buttonState = "Stop";
-        button.innerHTML = "Play";
-    }
 
-    // set play parameter in device
-    if(device){
-        context.resume();
-        const playParam = device.parametersById.get("play");
-        if(buttonState == "Play"){
-            playParam.value = 1;
-        } else {
-            playParam.value = 0;
-        }
-        console.log("play parameter set to: " + playParam.value);
-    }
+// load sample and buffer of dropped file into rnbo device data buffer by id
+async function loadAudioFileIntoBuffer(audioFile, bufferId){
+    console.log("loading audio file into buffer");
+
+    const audioFileURL = URL.createObjectURL(audioFile);
+    const fr = await fetch(audioFileURL);
+    buffer = await audioFile.arrayBuffer();
+    const audioBuf = await context.decodeAudioData(buffer);
     
-}
-
-// wetdry slider callback
-function wetdryChanged(slider) {
-    //console.log("wetdry slider changed");
-    // get value from slider
-    let wetdryValue = slider.value;
-
-    // update wetdry display
-    let wetdryDisplay = document.getElementById("wet-dry-display");
-    wetdryDisplay.innerHTML = wetdryValue;
-
-
-    // set wetdry parameter in device
     if(device){
-        const wetdryParam = device.parametersById.get("wetdry");
-        wetdryParam.value = wetdryValue;
-        console.log("wetdry parameter set to: " + wetdryParam.value);
+        await device.setDataBuffer(bufferId, buffer, numChans, sampleRate);
+
+        console.log("loaded buffer: " + bufferId + " with audio file: " + audioFile.name);
     }
 }
 
-// playback rate slider callback
-function playbackRateSliderChanged(slider) {
-    //console.log("playback rate slider changed");
-    // get value from slider
-    let playbackRateValue = slider.value;
 
-    // update playback rate text input
-    let playbackRateDisplay = document.getElementById("playback-rate-display");
-    playbackRateDisplay.value = playbackRateValue;
 
-    // set playback rate parameter in device
-    if(device){
-        const playbackRateParam = device.parametersById.get("playbackrate");
-        playbackRateParam.value = playbackRateValue;
-        console.log("playback rate parameter set to: " + playbackRateParam.value);
-    }
+function makePresetSelectOption (preset) {
+    const select = document.getElementById('preset-select');
+    
+    const option = document.createElement('option');
+    option.setAttribute('id', preset.name);
+    option.value = preset.name;
+    option.innerText = preset.name;
+
+    select.appendChild(option);
+
+    //return option
 }
 
-// playback rate text input callback
-function playbackRateTextInputChanged(input) {
-    //console.log("playback rate input changed");
-    // get value from input
-    let playbackRateValue = input.value;
-
-    // update playback rate slider
-    let playbackRateSlider = document.getElementById("playback-rate-slider");
-    playbackRateSlider.value = playbackRateValue;
-
-    // set playback rate parameter in device
-    if(device){
-        const playbackRateParam = device.parametersById.get("playbackrate");
-        playbackRateParam.value = playbackRateValue;
-        console.log("playback rate parameter set to: " + playbackRateParam.value);
-    }
+function loadPresetAtIndex(index) {
+    const preset = presets[index];
+    console.log(`Loading preset ${preset.name}`);
+    device.setPreset(preset.preset);
 }

@@ -21,6 +21,13 @@
     </div>
     
     <div id="section2">
+        <div id="presets">
+            <!-- Your presets content goes here -->
+            <select id="preset-select" oninput="presetSelected(this)">
+                <!-- Your select options go here -->
+            </select>
+
+        </div>
         <div id="play">
             <h2 id="play-text">play</h2>
             <button id="play-button" onclick="playButtonClicked(this)">Play</button>
@@ -42,6 +49,7 @@
         </div>
 
         <script src="rnbo-helpers.js"></script>
+        <script src="callbacks.js"></script>
         <script src="main.js"></script>
     </body>
 </html>

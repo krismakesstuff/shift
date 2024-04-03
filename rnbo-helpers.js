@@ -6,6 +6,9 @@
 
 const patchExportURL = "rnbo-export/shift.export.json";
 
+let response, patcher;
+let presets;
+
 async function createRNBODevice(patchExportURL) {
     // Create AudioContext
     const WAContext = window.AudioContext || window.webkitAudioContext;
@@ -35,7 +38,7 @@ async function createRNBODevice(patchExportURL) {
         };
         if (response && (response.status >= 300 || response.status < 200)) {
             errorContext.header = `Couldn't load patcher export bundle`,
-            errorContext.description = `Check app.js to see what file it's trying to load. Currently it's` +
+            errorContext.description = `Check to see what file it's trying to load. Currently it's` +
             ` trying to load "${patchExportURL}". If that doesn't` + 
             ` match the name of the file you exported from RNBO, modify` + 
             ` patchExportURL in app.js.`;
@@ -52,7 +55,7 @@ async function createRNBODevice(patchExportURL) {
     }
 
     // Get the patcher's presets
-    let presets = patcher.presets || [];
+    presets = patcher.presets || [];
     if (presets.length < 1) {
         console.log("No presets defined");
     } else {
@@ -60,6 +63,13 @@ async function createRNBODevice(patchExportURL) {
         presets.forEach(preset => {
             console.log(`preset ${preset.name}`);
         });
+    }
+
+    for(let i = 0; i < presets.length; i++) {
+        const preset = presets[i];
+        console.log(`Loading preset ${preset.name}`);
+        makePresetSelectOption(preset);
+        //device.setPreset(preset.preset);
     }
 
     // Prints out a list of the patcher's presets
