@@ -1,5 +1,8 @@
 # shift
-ping-pong delay and pitch shift. 
+
+#### a resampler
+upload audio files and apply these effects:  
+pitch shifter - ping-pong delay - lfo panner. 
 
 
 # todo: 
