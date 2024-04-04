@@ -18,7 +18,6 @@ async function setupRNBO() {
         console.log("Device not found");
     }
 
-
     // load data buffer descriptions
     bufferDescs = device.dataBufferDescriptions;
     bufferDescs.forEach((desc) => {
@@ -28,14 +27,86 @@ async function setupRNBO() {
             console.log(`buffer with id ${desc.id} references remote URL ${desc.url}`);
         }
     });
-    
-    //rnboDevice = [device, context];
-    
+}
+
+// setup offline rnbo device
+async function setupOfflineRNBO() {
+    [offlineDevice, offlineContext] = await createOfflineRNBODevice(patchExportURL);
+    console.log("Offline RNBO Device Created");
+
+    if(!offlineDevice) {
+        console.log("Offline Device not found");
+    }
 }
 
 // We can't await here because it's top level, so we have to check later
 // if device and context have been assigned
 setupRNBO();
+setupOfflineRNBO();
+
+
+
+// Fetch the exported patcher
+
+// async function fetchPatchExport(patchExportURL){
+//     let response, patcher;
+//     try {
+//         response = await fetch(patchExportURL);
+//         patcher = await response.json();
+//     } catch (err) {
+//         console.error(err);
+//     }
+//     return patcher;
+// }
+
+// const p = fetchPatchExport(patchExportURL);
+
+// console.log("patcher presets: " + p);
+// console.log("presets: " + p.presets);
+
+//updatePresets(p.presets);
+
+
+
+//createPresetSelect(presets, presetSelected);
+
+// download button event listener
+function download(){
+    console.log("download button clicked");
+
+    if(offlineDevice){
+        console.log("offline device found");
+        // get state of current parameters
+        let state = device.parameters;
+        offlineDevice.parameters = state;
+    
+        // create offline context
+        let offlineContext = new OfflineAudioContext(numChans, state.bufferSize, sampleRate);
+
+        // connect offline device to offline context
+        offlineDevice.node.connect(offlineContext.destination);
+
+        // start rendering
+        offlineContext.startRendering().then(function(renderedBuffer){
+            console.log("rendering complete");
+            // create audio buffer source
+            let source = offlineContext.createBufferSource();
+            source.buffer = renderedBuffer;
+            source.connect(offlineContext.destination);
+            source.start();
+        });
+
+
+
+
+    } else {
+        console.log("offline device not found");
+    }
+
+
+}
+
+
 
 // File drop zone, adding and defining event listeners
 let dropZone = document.getElementById("file-drop-area");

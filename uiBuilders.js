@@ -1,6 +1,50 @@
 console.log("uiBuilders.js loaded, loading UI...");
 
 
+// -------  UI Elements  ------- //
+
+ 
+createToggleButton("play", buttonCallback);
+createToggleButton("loop", buttonCallback);
+
+createSlider("output", 0, 100, 0.1, sliderCallback);
+createSlider("playbackrate", 0.001, 5, 0.01, sliderCallback);
+createSlider("wetdry", 0, 1.0, 0.01, sliderCallback);
+createSlider("shiftamount", 0, 50, 0.01, sliderCallback);
+createSlider("shiftwindow", 0, 100, 0.01, sliderCallback);
+createSlider("shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
+createSlider("delayms", 0, 1000, 0.1, sliderCallback);
+createSlider("delayfeedback", 0, 2.0, 0.01, sliderCallback);
+createSlider("lfofreq", 0, 15, 0.01, sliderCallback);
+createSlider("lfoamount", 0, 1.0, 0.01, sliderCallback);
+
+createDownloadButton("Download Audio", "output", "output.wav");
+
+let sliders = document.querySelectorAll("input[type=range]");
+
+
+//----------------- UI BUILDERS -----------------//
+
+
+// create a download button for the output buffer
+function createDownloadButton(name, bufferId, filename) {
+    // create outer div
+    const outerDiv = document.createElement("div");
+    outerDiv.className = "download-button-container";
+    outerDiv.id = "download-button";
+    
+    // create a button element
+    const button = document.createElement("button");
+    button.id = "download-button";
+    button.textContent = name;
+    button.addEventListener("click", () => { download(); });
+
+    // Insert the button into the section2 element
+    const section2 = document.getElementById("section2");
+    section2.appendChild(outerDiv);
+    outerDiv.appendChild(button);
+}
+
 
 // creates slider with given parameters and adds to section2
 function createSlider(name, min, max, step, callback) {
@@ -47,17 +91,6 @@ function createSlider(name, min, max, step, callback) {
     outerDiv.appendChild(input);
 }
 
-// make sure to call include this in each slider callback function
-// There's probably a better way to do this, but I'm hacking rn.
-// function sliderCallback(slider) {
-//     const sliderId = slider.id;
-//     const sliderValue = slider.value;
-//     console.log(`Slider ${sliderId} value: ${sliderValue}`);
-//     // update input display 
-//     const input = document.getElementById(sliderId + "-display");
-//     input.value = sliderValue;
-// }
-
 // create toggle butttons and adds to section2
 function createToggleButton(name, callback) {
     // create outer div
@@ -80,10 +113,8 @@ function createToggleButton(name, callback) {
 // create preset select for path presets. Called from createRMBODevice() in rnbo-helpers.js
 function createPresetSelect(presets, presetSelected) {
     // create outer div
-    const outerDiv = document.createElement("div");
-    outerDiv.className = "preset-select-container";
-    outerDiv.id = "preset-select";
-
+    const outerDiv = document.getElementById("preset-select-container");
+    //outerDiv.id = "preset-select";
 
     // create a label for the select
     const label = document.createElement("label");
@@ -104,34 +135,37 @@ function createPresetSelect(presets, presetSelected) {
         select.appendChild(option);
     });
 
-    // Insert the select into the section2 element
-    const section2 = document.getElementById("section2");
-    
     
     outerDiv.appendChild(select);
-    //ection2.appendChild(outerDiv);
-    section2.insertBefore(outerDiv, section2.firstChild);
 }
 
-//createPresetSelect(presets, presetSelected);
+
+// -------  EVENT Callbacks  ------- //
 
 
- 
-createToggleButton("play", buttonCallback);
-createToggleButton("loop", buttonCallback);
+// preset select callback
+function presetSelected() {
+    console.log("preset selected");
+    // get value from select
+    let presetName = this.value;
+    
+    console.log("selected preset: " + presetName + " " + typeof(presetName)); 
+     
+    // get preset object from name
+    let preset = presets.find(p => p.name === presetName);
+    console.log("preset object: " + preset.name);
+    //console.log("preset: " + preset.preset);
 
-createSlider("output", 0, 100, 0.1, sliderCallback);
-createSlider("playbackrate", 0.001, 5, 0.01, sliderCallback);
-createSlider("wetdry", 0, 1.0, 0.01, sliderCallback);
-createSlider("shiftamount", 0, 50, 0.01, sliderCallback);
-createSlider("shiftwindow", 0, 100, 0.01, sliderCallback);
-createSlider("shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
-createSlider("delayms", 0, 1000, 0.1, sliderCallback);
-createSlider("delayfeedback", 0, 2.0, 0.01, sliderCallback);
-createSlider("lfofreq", 0, 15, 0.01, sliderCallback);
-createSlider("lfoamount", 0, 1.0, 0.01, sliderCallback);
+    // set preset parameter in device
+    if(device){
+        device.setPreset(preset.preset);
+        console.log("preset parameter set to: " + preset.name);
+    }
 
-let sliders = document.querySelectorAll("input[type=range]");
+    // update sliders
+    updateSliders();
+}
+
 
 // update slider display values from device parameters
 function updateSliders() {
@@ -143,6 +177,29 @@ function updateSliders() {
         input.value = param.value;
     });
 }
+
+// update presets select options from device
+function updatePresets(presets) {
+    console.log("updating presets" + presets.length);
+    const select = document.getElementById("preset-select");
+    //select.innerHTML = "";
+
+    // clear current select options
+    while(select.firstChild) {
+        select.removeChild(select.firstChild);
+    }
+
+    
+    // loop through presets and add options
+    for(let i = 0; i < presets.length; i++) {
+        const option = document.createElement("option");
+        option.value = presets[i].name;
+        option.innerText = presets[i].name;
+        select.appendChild(option);
+    }
+
+}
+
 
 // callback for any slider, uses slider id to determine which parameter to set
 function sliderCallback() {
