@@ -9,7 +9,8 @@ pitch shifter - ping-pong delay - lfo panner.
 
 # todo: 
 - signal flow chart for ui? 
-- display buffer waveform
+- display buffer waveform, looking at wavesufer.js
+- 
 - add music timing to parameters
 - add method to record with device microphone to fill buffer
 - make wetbuffer downloadable
