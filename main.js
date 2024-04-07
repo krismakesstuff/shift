@@ -188,8 +188,8 @@ async function loadAudioFile(audioFile){
 
     reader.onload = function(e) {
         context.decodeAudioData(e.target.result).then(function(buffer) {
-            var source = context.createBufferSource();
-            source.buffer = buffer;
+            // var source = context.createBufferSource();
+            // source.buffer = buffer;
 
             bufferDescs.forEach((desc) => {
                 if(!!desc.file){
@@ -248,9 +248,9 @@ function createWaveform(buffer, file){
       })
 
 
-    wavesurfer.on('ready', function () {
-        wavesurfer.play();
-    });
+    // wavesurfer.on('ready', function () {
+    //     wavesurfer.play();
+    // });
 }
 
 

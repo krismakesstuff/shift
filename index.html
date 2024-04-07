@@ -5,6 +5,14 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/wavesurfer.js@7"></script>
     <h1> Shift </h1>
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+          }
+        }
+      </script>
 </head>
 <body>
     <h4> a resampler</h4>
@@ -34,5 +42,6 @@
         <script src="rnbo-helpers.js"></script>
         <script src="uiBuilders.js"></script>
         <script src="main.js"></script>
+        <script type="module"src="visualizer.js"></script>
     </body>
 </html>

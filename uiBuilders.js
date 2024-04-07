@@ -112,6 +112,8 @@ function createToggleButton(name, callback) {
 
 // create preset select for path presets. Called from createRMBODevice() in rnbo-helpers.js
 function createPresetSelect(presets, presetSelected) {
+    
+
     // create outer div
     const outerDiv = document.getElementById("preset-select-container");
     //outerDiv.id = "preset-select";
@@ -158,6 +160,11 @@ function presetSelected() {
 
     // set preset parameter in device
     if(device){
+        // if we are playing we stop. 
+        if(device.parametersById.get("play").value == 1){
+            device.parametersById.get("play").value = 0;
+        }
+
         device.setPreset(preset.preset);
         console.log("preset parameter set to: " + preset.name);
     }
@@ -188,7 +195,6 @@ function updatePresets(presets) {
     while(select.firstChild) {
         select.removeChild(select.firstChild);
     }
-
     
     // loop through presets and add options
     for(let i = 0; i < presets.length; i++) {
