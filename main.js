@@ -198,6 +198,17 @@ async function loadAudioFile(audioFile){
                     if(device){
         
                         device.setDataBuffer(desc.id, buffer);
+
+
+                        // if waveform has children already created, remove them and create new children for new waveform
+                        const waveformDiv = document.getElementById("waveform");
+                        while (waveformDiv.firstChild) {
+                            waveformDiv.removeChild(waveformDiv.firstChild);
+                            
+                        }
+
+                        createWaveform(buffer, audioFile);
+
                         console.log(`loaded audio file into buffer with id ${desc.id}`);
         
                     }
@@ -223,5 +234,24 @@ function loadDroppedFile(){
 
 // timer to check if file has been dropped
 setInterval(loadDroppedFile, 1000); 
+
+
+function createWaveform(buffer, file){
+
+    const url = URL.createObjectURL(file);
+
+    const wavesurfer = WaveSurfer.create({
+        container: '#waveform',
+        waveColor: '#4F4A85',
+        progressColor: '#383351',
+        url: url,
+      })
+
+
+    wavesurfer.on('ready', function () {
+        wavesurfer.play();
+    });
+}
+
 
 
