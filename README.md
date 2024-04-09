@@ -11,7 +11,7 @@ pitch shifter -> ping-pong delay -> lfo panner.
 - 
 - set fixed camera position
 - how many lights? What kind?
-- set light positions
+- set light positions, rms changes light intensity
 - fft visual manipulates point cloud
 - add music timing to parameters
 - add method to record with device microphone to fill buffer?

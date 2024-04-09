@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+//import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 console.log("visualizer.js loaded");
 
@@ -13,7 +14,8 @@ const raycaster = new THREE.Raycaster();
 const mouseClick = new THREE.Vector2();
 const mouseMove = new THREE.Vector2();
 
-
+const showLightHelpers = false;
+const showAxesHelper = true;
 
 const rendererH = 400; 
 
@@ -23,9 +25,11 @@ const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.inner
 //const camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
 
 // axes helper
-const axesHelper = new THREE.AxesHelper( 5 );
-scene.add( axesHelper );
 
+if(showAxesHelper){
+    const axesHelper = new THREE.AxesHelper( 5 );
+    scene.add( axesHelper );
+}
 // init rectArea Light Uniforms
 RectAreaLightUniformsLib.init();
 
@@ -35,13 +39,12 @@ renderer.shadowMap.enabled = true;
 renderer.setSize( window.innerWidth, window.innerHeight );
 
 // Ambient light
-const ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
-//scene.add( ambientLight );
+const ambientLight = new THREE.AmbientLight( 0xFFFFFF ); // soft white light
+scene.add( ambientLight );
 
 // directional light
-const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-directionalLight.position.set( -4, 10, 3);
-scene.add( directionalLight );
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.33 );
+directionalLight.position.set( -5, 5, 5);
 directionalLight.castShadow = true;
 let shadowcamSize = 50;
 let shadowDefinition = 2048;
@@ -53,10 +56,12 @@ directionalLight.shadow.camera.top = shadowcamSize;
 directionalLight.shadow.camera.bottom = -shadowcamSize;
 directionalLight.shadow.camera.far = 50;
 directionalLight.shadow.camera.near = 0.1;
+scene.add( directionalLight );
 
-const helper = new THREE.CameraHelper( directionalLight.shadow.camera );
-scene.add( helper );
-
+if(showLightHelpers){
+    const helper = new THREE.CameraHelper( directionalLight.shadow.camera );
+    scene.add( helper );
+}
 document.body.insertBefore(renderer.domElement, document.body.firstChild);
 //document.body.appendChild( labelRenderer.domElement );
 
@@ -179,41 +184,103 @@ const pointSize = 0.5;
 
 const pcHeight = 1;
 
-const pcBuffer = generatePointcloud( new THREE.Color( 1, 0, 0 ), pcSize, pcSize );
+const pcX = 2;
+const pcY = 2;
+const pcZ = -2;
+
+const pcBuffer = generatePointcloud( new THREE.Color( pcX, 0, 0 ), pcSize, pcSize );
 pcBuffer.scale.set( pcSize/2 , pcSize, pcSize );
-pcBuffer.position.set( - 5, pcHeight, 0 );
+pcBuffer.position.set( - 5, pcHeight, pcZ );
 scene.add( pcBuffer );
 
-const pcIndexed = generateIndexedPointcloud( new THREE.Color( 0, 1, 0 ), pcSize, pcSize );
+const pcIndexed = generateIndexedPointcloud( new THREE.Color( 0, pcY, 0 ), pcSize, pcSize );
 pcIndexed.scale.set( pcSize/2, pcSize, pcSize );
-pcIndexed.position.set( 0, pcHeight, 0 );
+pcIndexed.position.set( 0, pcHeight, pcZ );
 scene.add( pcIndexed );
 
-const pcIndexedOffset = generateIndexedWithOffsetPointcloud( new THREE.Color( 0, 1, 1 ), pcSize, pcSize );
+const pcIndexedOffset = generateIndexedWithOffsetPointcloud( new THREE.Color( 0, pcY, pcZ ), pcSize, pcSize );
 pcIndexedOffset.scale.set( pcSize/2, pcSize, pcSize );
-pcIndexedOffset.position.set( 5, pcHeight, 0 );
+pcIndexedOffset.position.set( 5, pcHeight, pcZ );
 scene.add( pcIndexedOffset );
 
 pointclouds = [ pcBuffer, pcIndexed, pcIndexedOffset ];
 
+// parameter section dimensions
+let numParams = 3;
+let parameterWidth = 5;
+let parameterHeight = 3; 
+let parameterDepth = 0.1;
+let parameterSegments = 2;
+let parameterRoundness = 0.5;
+// colors
+let parameterColor = 0xD3D3D3;
+
+// make parameterBackgroundGroup
+function createParameterBackgroundGroup(name, x, y, z){
+    const parameterBackgroundGroup = new THREE.Group();
+
+    // make the parameter background mesh
+    const parameterBackgroundGeometry = new RoundedBoxGeometry( parameterWidth, parameterHeight, parameterDepth, parameterSegments, parameterRoundness );
+    const parameterBackgroundMaterial = new THREE.MeshStandardMaterial( parameterColor );
+    const parameterBackgroundCube = new THREE.Mesh( parameterBackgroundGeometry, parameterBackgroundMaterial );
+    parameterBackgroundCube.position.set(x, y, z);
+    parameterBackgroundCube.castShadow = true;
+    parameterBackgroundCube.receiveShadow = true;
+    parameterBackgroundCube.name = name;
+    parameterBackgroundCube.userData = { id: name + "-parameter-background"};
+
+    // add to parameterBackgroundGroup
+    parameterBackgroundGroup.add(parameterBackgroundCube);
+
+    return parameterBackgroundGroup;
+}
+
+// make parameterGroup text 3D Object
+// function createParameterGroupText(name, x, y, z){
+//     const parameterGroupText = new THREE.Group();
+
+//     const parameterText = new THREE.TextGeometry( name, {
+//         font: font,
+//         size: 0.1,
+//         height: 0.01,
+//         curveSegments: 12,
+//         bevelEnabled: false,
+//         bevelThickness: 0.01,
+//         bevelSize: 0.01,
+//         bevelOffset: 0,
+//         bevelSegments: 5
+//     });
+
+//     const parameterTextMaterial = new THREE.MeshPhongMaterial( { color: 0x000000 } );
+//     const parameterTextMesh = new THREE.Mesh( parameterText, parameterTextMaterial );
+//     parameterTextMesh.position.set(x, y, z);
+//     parameterTextMesh.castShadow = true;
+//     parameterTextMesh.receiveShadow = true;
+
+//     // add to parameterGroupText
+//     parameterGroupText.add(parameterTextMesh);
+
+//     return parameterGroupText;
+// }
+
+// -- -- slider dimensions -- -- 
+// track
+let sliderTrackWidth = 4.2;
+let sliderTrackHeight = 0.25;
+let sliderTrackDepth = 0.1;
+let sliderTrackSegments = 2;
+let sliderTrackRoundness = 0.5;
+// thumb
+let sliderThumbSize = 0.25;
+let sliderThumbHeight = 0.33;
+let sliderThumbZOffset = sliderTrackDepth + 0.01;
+// colors
+let sliderTrackColor = 0x161A1D;
+let sliderThumbColor = 0xE5383B;
 
 // make sliderGroup
 function createSliderGroup(name, x, y, z){
     const sliderGroup = new THREE.Group();
-
-    // slider dimensions
-    // track
-    let sliderTrackWidth = 5;
-    let sliderTrackHeight = 0.75;
-    let sliderTrackDepth = 0.1;
-    let sliderTrackSegments = 2;
-    let sliderTrackRoundness = 0.5;
-    // thumb
-    let sliderThumbSize = 0.25;
-    let sliderThumbZOffset = sliderTrackDepth + 0.01;
-    // colors
-    let sliderTrackColor = 0x00ff00;
-    let sliderThumbColor = 0xff0000;
 
     // make the slider track mesh
     const sliderTrackGeometry = new RoundedBoxGeometry( sliderTrackWidth, sliderTrackHeight, sliderTrackDepth, sliderTrackSegments, sliderTrackRoundness );
@@ -226,14 +293,20 @@ function createSliderGroup(name, x, y, z){
     sliderTrackCube.name = name;
     sliderTrackCube.userData = { id: name + "-slider-track"};
     // make the slider thumb mesh
-    const sliderThumbGeometry = new THREE.CircleGeometry( sliderThumbSize, 32 );
-    const sliderThumbMaterial = new THREE.MeshBasicMaterial( { color: sliderThumbColor } );
+    //const sliderThumbGeometry = new THREE.CircleGeometry( sliderThumbSize, 32 );
+    const sliderThumbGeometry = new THREE.CylinderGeometry(sliderThumbSize + 0.1, sliderThumbSize, sliderThumbHeight, 32);
+    
+    const sliderThumbMaterial = new THREE.MeshStandardMaterial( { color: sliderThumbColor } );
     const sliderThumbCube = new THREE.Mesh( sliderThumbGeometry, sliderThumbMaterial );
+    sliderThumbCube.roughness = 0;
+    sliderThumbCube.metalness = 0;
     sliderThumbCube.name = name;
     sliderThumbCube.userData = { id: name + "-slider-thumb"};
-
+    sliderThumbCube.castShadow = true;
+    sliderThumbCube.receiveShadow = false;
     // position the thumb above the track
     sliderThumbCube.position.set(x, y, z + sliderThumbZOffset);
+    sliderThumbCube.rotation.x = Math.PI / 2;
     // make slider group
     sliderGroup.add(sliderTrackCube);
     sliderGroup.add(sliderThumbCube);
@@ -242,28 +315,72 @@ function createSliderGroup(name, x, y, z){
 }
 
 
-const sliderGroup = new THREE.Group();
+// make shift group
+const shiftGroup = new THREE.Group();
 
-let sliderY = 3.5;
-const shiftSliderGroup = createSliderGroup("shiftamount", 0, sliderY, 0);
-const shiftWindowSliderGroup = createSliderGroup("shiftwindow", 0, sliderY - 1, 0);
 
+const shiftBackgroundGroup = createParameterBackgroundGroup("shift", 0, 3, -0.1);
+
+const shiftPlaybackRateGroup = createSliderGroup("playbackrate", 0, 3.8, 0);
+const shiftSliderGroup = createSliderGroup("shiftamount", 0, 3, 0);
+const shiftWindowSliderGroup = createSliderGroup("shiftwindow", 0, 2.2, 0);
 // add sliders to sliderGroup
 
-sliderGroup.add( shiftSliderGroup );
-sliderGroup.add( shiftWindowSliderGroup );
-scene.add( sliderGroup );
+shiftGroup.add( shiftBackgroundGroup );
+shiftGroup.add( shiftPlaybackRateGroup );
+shiftGroup.add( shiftSliderGroup );
+shiftGroup.add( shiftWindowSliderGroup );
+scene.add( shiftGroup );
 
-//shiftSliderGroup.position.set(0, 0, 0);
-//scene.add( shiftSliderGroup );
+
+// make delay group 
+const delayGroup = new THREE.Group();
+
+let delayGroupOffset = parameterWidth + 0.5;
+
+const delayBackgroundGroup = createParameterBackgroundGroup("delay", delayGroupOffset, 3, -0.1);
+
+const delayDelaySendGroup = createSliderGroup("shiftdelaysend", delayGroupOffset, 3.8, 0);
+const delayDelayMsGroup = createSliderGroup("delayms", delayGroupOffset, 3, 0);
+const delayFeedbackGroup = createSliderGroup("delayfeedback", delayGroupOffset, 2.2, 0);
+
+// add sliders to sliderGroup
+delayGroup.add( delayBackgroundGroup );
+delayGroup.add( delayDelaySendGroup );
+delayGroup.add( delayDelayMsGroup );
+delayGroup.add( delayFeedbackGroup );
+
+scene.add( delayGroup );
+
+// make lfo group
+const lfoGroup = new THREE.Group();
+
+let lfoGroupOffset = 2 * (parameterWidth + 0.5);
+
+const lfoBackgroundGroup = createParameterBackgroundGroup("lfo", lfoGroupOffset, 3, -0.1);
+
+const lfoFreqGroup = createSliderGroup("lfofreq", lfoGroupOffset, 3.8, 0);
+const lfoAmountGroup = createSliderGroup("lfoamount", lfoGroupOffset, 3, 0);
+
+// add sliders to sliderGroup
+lfoGroup.add( lfoBackgroundGroup );
+lfoGroup.add( lfoFreqGroup );   
+lfoGroup.add( lfoAmountGroup );
+
+scene.add( lfoGroup );
+
 
 
 
 // make a floor
 
-let floorWidth = 10;
-let floorHeight = 10;
+let floorWidth = 30;
+let floorHeight = 20;
 let floorDepth = 0.6;
+
+let floorX = parameterWidth + 0.5;    
+let floorY = 0;
+let floorZ = 0;
 
 const geoFloor = new THREE.BoxGeometry( floorWidth, floorDepth, floorHeight);
 const matStdFloor = new THREE.MeshStandardMaterial( { color: 0xbcbcbc, roughness: 0.1, metalness: 0 } );
@@ -271,7 +388,7 @@ const matPhongFloor = new THREE.MeshPhongMaterial( { color: 0xbcbcbc } );
 const mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
 mshStdFloor.castShadow = false;
 mshStdFloor.receiveShadow = true;
-mshStdFloor.position.set(0, -floorDepth, 0);
+mshStdFloor.position.set( floorX, floorY, floorZ);
 scene.add( mshStdFloor );
 
 // make the orbital controls
@@ -301,10 +418,9 @@ const rectLightHelper2 = new RectAreaLightHelper( rectLight2 );
 
 
 // set initial camera position
-camera.position.set(0, 3, 5 );
-//camera.lookAt(6, 6, 6);
-camera.lookAt(0, 3, 3);
-//camera.lookAt(scene.position);
+//camera.lookAt(delayBackgroundGroup.position);
+camera.position.set(parameterWidth + 0.5, 5, 10 );
+camera.rotateY(Math.PI);
 
 controls.update();
 
@@ -312,23 +428,23 @@ controls.update();
 // add mouse event listeners
 document.addEventListener('mousedown', mouseDownCallback, false);
 document.addEventListener('mouseup', mouseUpCallback, false);
-document.addEventListener('mousemove', mouseMoveCallback, false);
+//document.addEventListener('mousemove', mouseMoveCallback, false);
 
 function mouseDownCallback(event){
-    console.log("mouse down");
     mouseClick.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouseClick.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-    console.log("mouseClick: " + mouseClick.x + ", " + mouseClick.y)
+    console.log("mouseclick: " + mouseClick.x + ", " + mouseClick.y)
 
     raycaster.setFromCamera( mouseClick, camera );
 
-    const intersects = raycaster.intersectObjects( sliderGroup.children );
+    const intersects = raycaster.intersectObjects( shiftGroup.children );
 
     if ( intersects.length > 0 ) {
         for(let i = 0; i < intersects.length; i++)
         {
-            const object = intersects[i].object;    
+            const object = intersects[i].object;  
+            console.log("intersected object: " + object.name);  
             switch(object.name){
                 case "shiftamount":
                     console.log("intersected shiftamount slider");
@@ -360,29 +476,29 @@ function mouseMoveCallback(event){
 
     raycaster.setFromCamera( mouseMove, camera );
 
-    const intersects = raycaster.intersectObjects( sliderGroup.children );
+    const intersects = raycaster.intersectObjects( shiftGroup.children );
 
-    if ( intersects.length > 0 ) {
-        for(let i = 0; i < intersects.length; i++)
-        {
-            const object = intersects[i].object;
-            switch(object.name){
-                case "shiftamount":
-                    console.log("intersected shiftamount slider");
-                    console.log('objectid: ' + object.userData.id);
-                    setThumbPosition(mouseMove, object.parent);
-                    break;
-                case "shiftwindow":
-                    console.log("intersected shiftwindow slider");
-                    console.log('objectid: ' + object.userData.id);
-                    setThumbPosition(mouseMove, object.parent);
-                    break;
-                default:
-                    console.log("no slider clicked");
-                    break;
-                }
-        }
+    
+    for(let i = 0; i < intersects.length; i++)
+    {
+        const object = intersects[i].object;
+        switch(object.name){
+            case "shiftamount":
+                console.log("intersected shiftamount slider");
+                console.log('objectid: ' + object.userData.id);
+                setThumbPosition(mouseMove, object.parent);
+                break;
+            case "shiftwindow":
+                console.log("intersected shiftwindow slider");
+                console.log('objectid: ' + object.userData.id);
+                setThumbPosition(mouseMove, object.parent);
+                break;
+            default:
+                console.log("no slider clicked");
+                break;
+            }
     }
+    
 }
 
 function mouseUpCallback(event){
