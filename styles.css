@@ -24,6 +24,10 @@
 
 }
 
+body{
+    position: absolute;
+}
+
 h1 {
     font-family: "Helvetica Neue", Arial, sans-serif;
     font-size: 36px;

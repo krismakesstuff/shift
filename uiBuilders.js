@@ -206,8 +206,8 @@ function updatePresets(presets) {
 
 }
 
-
 // callback for any slider, uses slider id to determine which parameter to set
+// reference index.html createSlider() function for slider id naming convention
 function sliderCallback() {
     const sliderId = this.id;
     const sliderValue = this.value;

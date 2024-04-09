@@ -42,7 +42,7 @@ async function setupOfflineRNBO() {
 // We can't await here because it's top level, so we have to check later
 // if device and context have been assigned
 setupRNBO();
-setupOfflineRNBO();
+//setupOfflineRNBO();
 
 
 

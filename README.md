@@ -8,10 +8,11 @@ pitch shifter -> ping-pong delay -> lfo panner.
 
 
 # todo: 
-- make cube (or other shape) rotate based on shift parameters
-- have a shape for each modulator: shifter, delay, lfo
-- add fft visualizer in background of rotating shapes
-
+- 
+- set fixed camera position
+- how many lights? What kind?
+- set light positions
+- fft visual manipulates point cloud
 - add music timing to parameters
-- add method to record with device microphone to fill buffer
-- make wetbuffer downloadable
+- add method to record with device microphone to fill buffer?
+- make wetbuffer downloadable 
