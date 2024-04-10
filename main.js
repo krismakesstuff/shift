@@ -109,13 +109,12 @@ function download(){
 
 
 // File drop zone, adding and defining event listeners
-let dropZone = document.getElementById("file-drop-area");
 
-dropZone.addEventListener("dragover", dragOverHandler, false);
-dropZone.addEventListener("drop", dropHandler, false);
+document.addEventListener("dragover", dragOverHandler, false);
+document.addEventListener("drop", dropHandler, false);
 
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, preventDefaults, false)
+    document.addEventListener(eventName, preventDefaults, false)
   })
   
 function preventDefaults (e) {
@@ -242,7 +241,7 @@ function createWaveform(buffer, file){
 
     const wavesurfer = WaveSurfer.create({
         container: '#waveform',
-        waveColor: '#4F4A85',
+        waveColor: '#E5383b',
         progressColor: '#383351',
         url: url,
       })

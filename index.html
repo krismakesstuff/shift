@@ -4,7 +4,7 @@
     <title>shift</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/wavesurfer.js@7"></script>
-    <h1> Shift </h1>
+    
     <script type="importmap">
         {
           "imports": {
@@ -15,33 +15,38 @@
       </script>
 </head>
 <body>
-    <h4> a resampler</h4>
-    <div id="section1">
+
+    <input type="file" id="fileElem" multiple accept="audio/*" style="display:none" >   
+
+    <div id="title-section">
+        <h1>shift</h1>
+        <h2>an audio re-sampler</h2>
+    </div>  
+    <div id="file-section">
         
-        <div id="file-drop-area" >
-            <!-- Your file drop area content goes here -->
-            <p id="file-drop-text">Drop a .wav or mp3 here</p>
-
-            <input type="file" id="fileElem" multiple accept="audio/*" style="display:none" >
-        </div>
-
+    
         
         <div id="waveform">
             <!-- Your waveform content goes here -->
         </div>
     </div>
 
-    <div id="preset-select-container">
-            
-    </div>
+    
 
-    <div id="section2">
+    <div id="parameters-section">
         <!-- parameters go here, added from uiBuilders.js-->
         
 
-        <script src="rnbo-helpers.js"></script>
-        <script src="uiBuilders.js"></script>
-        <script src="main.js"></script>
         <!--<script type="module"src="visualizer.js"></script>-->
+        
+    </div>
+    
+    <div id="output-section">
+        
+    </div>
+    <script src="uiBuilders.js"></script>
+    <script src="rnbo-helpers.js"></script>
+    <script src="main.js"></script>
+
     </body>
 </html>

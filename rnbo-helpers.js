@@ -87,8 +87,9 @@ async function createRNBODevice(patchExportURL, offline) {
     // Set the default preset
     device.setPreset(presets[defaultIndex].preset);
 
-    // Create a preset select element
-    createPresetSelect(presets, presetSelected);
+    // Create a preset select element in the output section
+    let outputSection = document.getElementById("output-section");
+    createPresetSelect(outputSection, presets, presetSelected);
 
     return [device, context];
 }

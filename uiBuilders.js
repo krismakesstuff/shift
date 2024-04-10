@@ -3,22 +3,68 @@ console.log("uiBuilders.js loaded, loading UI...");
 
 // -------  UI Elements  ------- //
 
- 
-createToggleButton("play", buttonCallback);
-createToggleButton("loop", buttonCallback);
+// create and add Toggle Buttons for play and loop 
+let fileSection = document.getElementById("file-section");
 
-createSlider("output", 0, 100, 0.1, sliderCallback);
-createSlider("playbackrate", 0.001, 5, 0.01, sliderCallback);
-createSlider("wetdry", 0, 1.0, 0.01, sliderCallback);
-createSlider("shiftamount", 0, 50, 0.01, sliderCallback);
-createSlider("shiftwindow", 0, 100, 0.01, sliderCallback);
-createSlider("shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
-createSlider("delayms", 0, 1000, 0.1, sliderCallback);
-createSlider("delayfeedback", 0, 2.0, 0.01, sliderCallback);
-createSlider("lfofreq", 0, 15, 0.01, sliderCallback);
-createSlider("lfoamount", 0, 1.0, 0.01, sliderCallback);
+createToggleButton(fileSection, "loop", buttonCallback);
+createToggleButton(fileSection, "play", buttonCallback);
 
-createDownloadButton("Download Audio", "output", "output.wav");
+// create Parent Divs for parameters
+const shiftParentDiv = document.createElement("div");    
+shiftParentDiv.id = "shift-parent";
+
+const delayParentDiv = document.createElement("div");
+delayParentDiv.id = "delay-parent";
+
+const lfoParentDiv = document.createElement("div"); 
+lfoParentDiv.id = "lfo-parent";
+
+// Insert the parent divs into the parameters-section element
+const parametersSection = document.getElementById("parameters-section");
+parametersSection.appendChild(shiftParentDiv);
+parametersSection.appendChild(delayParentDiv);
+parametersSection.appendChild(lfoParentDiv);
+
+// create sliders
+
+// shift parameters
+createSlider(shiftParentDiv, "playbackrate", 0.001, 5, 0.01, sliderCallback);
+createSlider(shiftParentDiv, "shiftamount", 0, 50, 0.01, sliderCallback);
+createSlider(shiftParentDiv, "shiftwindow", 0, 100, 0.01, sliderCallback);
+// shift label
+let shiftLabel = document.createElement("div");
+shiftLabel.id = "shift-label";
+shiftLabel.innerHTML = "shift";
+shiftParentDiv.appendChild(shiftLabel);
+
+// delay parameters
+createSlider(delayParentDiv, "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
+createSlider(delayParentDiv, "delayms", 0, 1000, 0.1, sliderCallback);  
+createSlider(delayParentDiv, "delayfeedback", 0, 2.0, 0.01, sliderCallback);
+
+// delay label
+let delayLabel = document.createElement("div");
+delayLabel.id = "delay-label";
+delayLabel.innerHTML = "delay";
+delayParentDiv.appendChild(delayLabel);
+
+// lfo parameters
+createSlider(lfoParentDiv, "lfofreq", 0, 15, 0.01, sliderCallback); 
+createSlider(lfoParentDiv, "lfoamount", 0, 1.0, 0.01, sliderCallback);  
+
+// lfo label
+let lfoLabel = document.createElement("div");
+lfoLabel.id = "lfo-label";
+lfoLabel.innerHTML = "lfo";
+lfoParentDiv.appendChild(lfoLabel); 
+
+// output section parameters
+let outputDiv = document.getElementById("output-section");
+
+createSlider(outputDiv, "output", 0, 1, 0.01, sliderCallback);
+createSlider(outputDiv, "wetdry", 0, 1.0, 0.01, sliderCallback);
+createDownloadButton(outputDiv, "print", "output", "output.wav");
+
 
 let sliders = document.querySelectorAll("input[type=range]");
 
@@ -26,8 +72,8 @@ let sliders = document.querySelectorAll("input[type=range]");
 //----------------- UI BUILDERS -----------------//
 
 
-// create a download button for the output buffer
-function createDownloadButton(name, bufferId, filename) {
+// create a print button for the output buffer
+function createDownloadButton(parentDiv, name, bufferId, filename) {
     // create outer div
     const outerDiv = document.createElement("div");
     outerDiv.className = "download-button-container";
@@ -39,22 +85,21 @@ function createDownloadButton(name, bufferId, filename) {
     button.textContent = name;
     button.addEventListener("click", () => { download(); });
 
-    // Insert the button into the section2 element
-    const section2 = document.getElementById("section2");
-    section2.appendChild(outerDiv);
+    // Insert the button into the output element
+    //const outputSection = document.getElementById("output-section");
     outerDiv.appendChild(button);
+    parentDiv.appendChild(outerDiv);
 }
 
 
 // creates slider with given parameters and adds to section2
-function createSlider(name, min, max, step, callback) {
+function createSlider(parentDiv, name, min, max, step, callback) {
     // create outer div
     const outerDiv = document.createElement("div");
     outerDiv.className = "slider-container";
     outerDiv.id = name;
     
-    
-    // Create a slider element
+    // Create a input slider element
     const slider = document.createElement("input");
     slider.type = "range";
     slider.min = min;
@@ -70,7 +115,7 @@ function createSlider(name, min, max, step, callback) {
     label.textContent = name;
     label.htmlFor = name;
 
-    // create a input element that updates the slider value
+    // create a number input element that updates the slider value
     const input = document.createElement("input");
     input.type = "number";
     input.min = min;
@@ -83,16 +128,17 @@ function createSlider(name, min, max, step, callback) {
         callback(event);
     });
 
-    // Insert the slider and label into the section2 element
-    const section2 = document.getElementById("section2");
-    section2.appendChild(outerDiv);
+    // Insert the slider and label into the parameters-section element
+    const parametersSection = document.getElementById("parameters-section");
     outerDiv.appendChild(label);
-    outerDiv.appendChild(slider);
     outerDiv.appendChild(input);
+    outerDiv.appendChild(slider);
+//    parametersSection.appendChild(outerDiv);
+    parentDiv.appendChild(outerDiv);
 }
 
 // create toggle butttons and adds to section2
-function createToggleButton(name, callback) {
+function createToggleButton(parentDiv, name, callback) {
     // create outer div
     const outerDiv = document.createElement("div");
     outerDiv.className = "toggle-container";
@@ -105,22 +151,24 @@ function createToggleButton(name, callback) {
     button.addEventListener("click", callback);
 
     // Insert the button into the section2 element
-    const section2 = document.getElementById("section2");
-    section2.appendChild(outerDiv);
+    //const fileSection = document.getElementById("file-section");
     outerDiv.appendChild(button);
+    //fileSection.appendChild(outerDiv);
+    parentDiv.insertBefore(outerDiv, fileSection.firstChild);
 }
 
 // create preset select for path presets. Called from createRMBODevice() in rnbo-helpers.js
-function createPresetSelect(presets, presetSelected) {
+function createPresetSelect(parentDiv, presets, presetSelected) {
     
 
     // create outer div
-    const outerDiv = document.getElementById("preset-select-container");
-    //outerDiv.id = "preset-select";
+    const outerDiv = document.createElement("div");
+    outerDiv.className = "preset-select-container"; 
 
     // create a label for the select
     const label = document.createElement("label");
     label.textContent = "Presets";
+    label.id = "preset-label";
     label.htmlFor = "preset-select";
     outerDiv.appendChild(label);
 
@@ -139,6 +187,7 @@ function createPresetSelect(presets, presetSelected) {
 
     
     outerDiv.appendChild(select);
+    parentDiv.appendChild(outerDiv);
 }
 
 
