@@ -5,8 +5,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+//import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+//import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 console.log("visualizer.js loaded");
 
@@ -317,8 +317,6 @@ function createSliderGroup(name, x, y, z){
 
 // make shift group
 const shiftGroup = new THREE.Group();
-
-
 const shiftBackgroundGroup = createParameterBackgroundGroup("shift", 0, 3, -0.1);
 
 const shiftPlaybackRateGroup = createSliderGroup("playbackrate", 0, 3.8, 0);
@@ -330,7 +328,7 @@ shiftGroup.add( shiftBackgroundGroup );
 shiftGroup.add( shiftPlaybackRateGroup );
 shiftGroup.add( shiftSliderGroup );
 shiftGroup.add( shiftWindowSliderGroup );
-scene.add( shiftGroup );
+//scene.add( shiftGroup );
 
 
 // make delay group 
@@ -350,7 +348,7 @@ delayGroup.add( delayDelaySendGroup );
 delayGroup.add( delayDelayMsGroup );
 delayGroup.add( delayFeedbackGroup );
 
-scene.add( delayGroup );
+//scene.add( delayGroup );
 
 // make lfo group
 const lfoGroup = new THREE.Group();
@@ -367,10 +365,13 @@ lfoGroup.add( lfoBackgroundGroup );
 lfoGroup.add( lfoFreqGroup );   
 lfoGroup.add( lfoAmountGroup );
 
-scene.add( lfoGroup );
+//scene.add( lfoGroup );
 
-
-
+let uiGroups = new THREE.Group();
+uiGroups.add(shiftGroup);
+uiGroups.add(delayGroup);
+uiGroups.add(lfoGroup);
+scene.add(uiGroups);
 
 // make a floor
 
@@ -418,9 +419,10 @@ const rectLightHelper2 = new RectAreaLightHelper( rectLight2 );
 
 
 // set initial camera position
-//camera.lookAt(delayBackgroundGroup.position);
-camera.position.set(parameterWidth + 0.5, 5, 10 );
-camera.rotateY(Math.PI);
+//camera.lookAt(uiGroups.position);
+camera.position.set(1, 5, 10 );
+//camera.rotateY(Math.PI);
+camera.lookAt(0, 1, 0);
 
 controls.update();
 
@@ -428,7 +430,7 @@ controls.update();
 // add mouse event listeners
 document.addEventListener('mousedown', mouseDownCallback, false);
 document.addEventListener('mouseup', mouseUpCallback, false);
-//document.addEventListener('mousemove', mouseMoveCallback, false);
+document.addEventListener('mousemove', mouseMoveCallback, false);
 
 function mouseDownCallback(event){
     mouseClick.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -438,7 +440,7 @@ function mouseDownCallback(event){
 
     raycaster.setFromCamera( mouseClick, camera );
 
-    const intersects = raycaster.intersectObjects( shiftGroup.children );
+    const intersects = raycaster.intersectObjects( uiGroups.children );
 
     if ( intersects.length > 0 ) {
         for(let i = 0; i < intersects.length; i++)
@@ -476,29 +478,36 @@ function mouseMoveCallback(event){
 
     raycaster.setFromCamera( mouseMove, camera );
 
-    const intersects = raycaster.intersectObjects( shiftGroup.children );
+    const intersects = raycaster.intersectObjects( uiGroups.children  );
 
+    if(intersects.length > 0){
     
-    for(let i = 0; i < intersects.length; i++)
-    {
-        const object = intersects[i].object;
-        switch(object.name){
-            case "shiftamount":
-                console.log("intersected shiftamount slider");
-                console.log('objectid: ' + object.userData.id);
-                setThumbPosition(mouseMove, object.parent);
-                break;
-            case "shiftwindow":
-                console.log("intersected shiftwindow slider");
-                console.log('objectid: ' + object.userData.id);
-                setThumbPosition(mouseMove, object.parent);
-                break;
-            default:
-                console.log("no slider clicked");
-                break;
-            }
+        for(let i = 0; i < intersects.length; i++)
+        {
+
+            // switch color of intersected object 
+            intersects[i].object.material.color.set( 0xff0000 );
+
+
+
+            // const object = intersects[i].object;
+            // switch(object.name){
+            //     case "shiftamount":
+            //         console.log("intersected shiftamount slider");
+            //         console.log('objectid: ' + object.userData.id);
+            //         setThumbPosition(mouseMove, object.parent);
+            //         break;
+            //     case "shiftwindow":
+            //         console.log("intersected shiftwindow slider");
+            //         console.log('objectid: ' + object.userData.id);
+            //         setThumbPosition(mouseMove, object.parent);
+            //         break;
+            //     default:
+            //         console.log("no slider clicked");
+            //         break;
+            //     }
+        }
     }
-    
 }
 
 function mouseUpCallback(event){
