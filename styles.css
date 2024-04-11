@@ -48,7 +48,7 @@ h1 {
     font-size: 48px;
     font-weight: bold;
     font-style: italic;
-    color: var(--color-pure-red);
+    color: var(--color-light-red);
     background-color: var(--color-secondary);
     text-transform: var(--text-transform);
     text-align: left;
@@ -204,6 +204,17 @@ body{
     padding: var(--boarder-hover-width);
 }
 
+#waveform[data-loading="true"] {
+    background-color: var(--color-light-red);
+
+}
+
+#waveform[data-loading="false"] {
+    background-color: var(--color-light-grey);
+}
+
+
+
 #parameters-section {
     display: grid;
     grid-area: "parameters-section";
@@ -216,6 +227,7 @@ body{
     padding-top: 40px;
     padding-bottom: var(--vertical-padding);
     background-color: var(--color-dark);
+    
 }
 
 .parameter-label {
@@ -223,8 +235,9 @@ body{
     color: var(--color-dark);
     font-size: var(--text-size-large);
     font-weight: bold;
-    align-self: center;
-    justify-self: center;
+    align-self: end;
+    justify-self: start;
+    padding-left: 10px;
 }
 
 .parameter-parent {
@@ -235,7 +248,7 @@ body{
     padding: 10px;
     background-color: var(--color-light-grey);    
     border-radius: var(--border-radius-small);
-
+    /* box-shadow: 5px 5px var(--border-radius-small) 5px var(--color-light-white); */
 }
 
 /* #shift-parent {

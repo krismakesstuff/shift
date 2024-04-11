@@ -88,13 +88,13 @@ function createPrintButton(parentDiv, name, bufferId, filename) {
     // create outer div
     const outerDiv = document.createElement("div");
     outerDiv.className = "button-container";
-    outerDiv.id = "print-button-container";
+    outerDiv.id = name + "-button-container";
     
     // create a button element
     const button = document.createElement("button");
-    button.id = "print-button";
+    button.id = name + "-button";
     button.textContent = name;
-    button.addEventListener("click", () => { download(); });
+    button.addEventListener("click", () => { printAudioToFile(); });
 
     // Insert the button into the output element
     //const outputSection = document.getElementById("output-section");
@@ -324,20 +324,66 @@ function buttonCallback() {
     }
 }
 
-// create Overlay
-function createOverlay(parentDiv, name) {
-    const overlay = document.createElement("div");
-    overlay.id = name + "-overlay";
-    overlay.className = "overlay";
-    overlay.style.appearance = "none";
-    
-    // parentDiv.addEventListener("dragover", (event) => {
-    //     console.log("dragover");
-    //     event.preventDefault();
-    //     overlay.style.display = "block";
-    //     overlay.style.appearance = "auto";
-    // });
 
-    parentDiv.appendChild(overlay);
-    return overlay;
+// print audio to file
+function printAudioToFile() {
+    console.log("print button clicked");
+    
+    
+    
+    
+    // calculate buffer legnth based off current parameters
+    let bufferLength = getBufferLength();
+
+    // create offline device
+    createOfflineRNBODevice(patchExportURL, bufferLength);
+    
+    offlineDevice.parameters = device.parameters;
+    
+
+    // connect offline device to offline context
+    offlineDevice.node.connect(offlineContext.destination);
+
+    // start rendering
+    offlineContext.startRendering().then(function(renderedBuffer){
+        console.log("rendering complete");
+        // create audio buffer source
+        let source = offlineContext.createBufferSource();
+        source.buffer = renderedBuffer;
+        source.connect(offlineContext.destination);
+        source.start();
+    });
+}
+
+
+// -------  Helper Functions  ------- //
+
+// get buffer length based off current parameters
+function getBufferLength() {
+
+    
+    let playbackrate = device.parametersById.get("playbackrate").value;
+    let shiftamount = device.parametersById.get("shiftamount").value;
+    let shiftwindow = device.parametersById.get("shiftwindow").value;
+    let delayms = device.parametersById.get("delayms").value;
+    let lfofreq = device.parametersById.get("lfofreq").value;
+    let lfoamount = device.parametersById.get("lfoamount").value;
+    let delayfeedback = device.parametersById.get("delayfeedback").value;
+    let shiftdelaysend = device.parametersById.get("shiftdelaysend").value;
+    let wetdry = device.parametersById.get("wetdry").value;
+
+    // calculate buffer length in seconds
+    
+    
+    // get parameter values by id
+    // let playbackrate = parameters.get("playbackrate").value;
+    
+
+    // calculate buffer length
+
+
+    
+
+
+    return bufferLength;
 }

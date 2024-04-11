@@ -30,7 +30,7 @@ async function setupRNBO() {
 }
 
 // setup offline rnbo device
-async function setupOfflineRNBO() {
+async function createOfflineRNBO() {
     [offlineDevice, offlineContext] = await createOfflineRNBODevice(patchExportURL);
     console.log("Offline RNBO Device Created");
 
@@ -42,7 +42,7 @@ async function setupOfflineRNBO() {
 // We can't await here because it's top level, so we have to check later
 // if device and context have been assigned
 setupRNBO();
-//setupOfflineRNBO();
+//createOfflineRNBO();
 
 
 
@@ -71,40 +71,40 @@ setupRNBO();
 //createPresetSelect(presets, presetSelected);
 
 // download button event listener
-function download(){
-    console.log("download button clicked");
+// function download(){
+//     console.log("download button clicked");
 
-    if(offlineDevice){
-        console.log("offline device found");
-        // get state of current parameters
-        let state = device.parameters;
-        offlineDevice.parameters = state;
+//     if(offlineDevice){
+//         console.log("offline device found");
+//         // get state of current parameters
+//         let state = device.parameters;
+//         offlineDevice.parameters = state;
     
-        // create offline context
-        let offlineContext = new OfflineAudioContext(numChans, state.bufferSize, sampleRate);
+//         // create offline context
+//         let offlineContext = new OfflineAudioContext(numChans, state.bufferSize, sampleRate);
 
-        // connect offline device to offline context
-        offlineDevice.node.connect(offlineContext.destination);
+//         // connect offline device to offline context
+//         offlineDevice.node.connect(offlineContext.destination);
 
-        // start rendering
-        offlineContext.startRendering().then(function(renderedBuffer){
-            console.log("rendering complete");
-            // create audio buffer source
-            let source = offlineContext.createBufferSource();
-            source.buffer = renderedBuffer;
-            source.connect(offlineContext.destination);
-            source.start();
-        });
-
-
+//         // start rendering
+//         offlineContext.startRendering().then(function(renderedBuffer){
+//             console.log("rendering complete");
+//             // create audio buffer source
+//             let source = offlineContext.createBufferSource();
+//             source.buffer = renderedBuffer;
+//             source.connect(offlineContext.destination);
+//             source.start();
+//         });
 
 
-    } else {
-        console.log("offline device not found");
-    }
 
 
-}
+//     } else {
+//         console.log("offline device not found");
+//     }
+
+
+// }
 
 
 
@@ -274,6 +274,8 @@ function createWaveform(buffer, file){
         let isDataLoading = waveform.getAttribute("data-loading");  
         if(isDataLoading === "false"){
             waveform.setAttribute("data-loading", "true");
+            waveform.innerHTML = "loading waveform... " + percents + "%";
+            waveform.style.zIndex = 1;
         }
     });
 
@@ -284,6 +286,7 @@ function createWaveform(buffer, file){
         let isDataLoading = waveform.getAttribute("data-loading");  
         if(isDataLoading === "true"){
             waveform.setAttribute("data-loading", "false");
+            waveform.innerHTML = "";
         }
     });
 };

@@ -95,12 +95,12 @@ async function createRNBODevice(patchExportURL, offline) {
 }
 
 // create offline rnbo device
-async function createOfflineRNBODevice(patchExportURL) {
+async function createOfflineRNBODevice(patchExportURL, bufferLength) {
     // Create OfflineAudioContext
     const numChans = 2;
     const sampleRate = 44100;
-    const bufferSize = 4096;
-    const offlineContext = new OfflineAudioContext(numChans, bufferSize, sampleRate);
+
+    const offlineContext = new OfflineAudioContext(numChans, bufferLength, sampleRate);
 
 
     // Fetch the exported patcher
@@ -135,7 +135,9 @@ async function createOfflineRNBODevice(patchExportURL) {
     let device;
     try {
         device = await RNBO.createDevice({ context: offlineContext, patcher });
+        console.log("Offline RNBO Device Created");
     } catch (err) {
+        console.error(err);
         throw err;
     }
 
@@ -158,38 +160,3 @@ function loadRNBOScript(version) {
     });
 }
 
-function noteOn(rnboDevice, context, pitch, velocity) {
-    let midiChannel = 0;
-    let midiPort = 0;
-
-    // Format a MIDI message payload, this constructs a MIDI note-on event
-    let noteOnMessage = [
-        144 + midiChannel, // Code for a note on: 10010000 & MIDI channel (0-15)
-        pitch, // MIDI Note
-        velocity // MIDI Velocity
-    ];
-
-    // When scheduling an event, use the current audio context time
-    // multiplied by 1000 (converting seconds to milliseconds)
-    let noteOnEvent = new RNBO.MIDIEvent(context.currentTime * 1000, midiPort, noteOnMessage);
-
-    rnboDevice.scheduleEvent(noteOnEvent);
-}
-
-function noteOff(rnboDevice, context, pitch) {
-    let midiChannel = 0;
-    let midiPort = 0;
-
-    // Format a MIDI message payload, this constructs a MIDI note-off event
-    let noteOffMessage = [
-        128 + midiChannel, // Code for a note on: 10010000 & MIDI channel (0-15)
-        pitch, // MIDI Note
-        0 // MIDI Velocity is 0 for a note off
-    ];
-
-    // When scheduling an event, use the current audio context time
-    // multiplied by 1000 (converting seconds to milliseconds)
-    let noteOffEvent = new RNBO.MIDIEvent(context.currentTime * 1000, midiPort, noteOffMessage);
-
-    rnboDevice.scheduleEvent(noteOffEvent);
-}

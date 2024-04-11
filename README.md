@@ -10,9 +10,8 @@ pitch shifter -> ping-pong delay -> lfo panner.
 
 # todo: 
 -
-- make loading display for waveform
-- make wetbuffer downloadable 
-- draw playbackrate as moving playhead, shift parameters on waveform.
+- finish print button, see: https://russellgood.com/how-to-convert-audiobuffer-to-audio-file/
+- make waveform overlay display playhead when playing and text when loading
 - custom sliders
 - midi input?
 - add method to record with device microphone to fill buffer?
