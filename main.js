@@ -111,11 +111,12 @@ function download(){
 // File drop zone, adding and defining event listeners
 
 document.addEventListener("dragover", dragOverHandler, false);
+document.addEventListener("dragleave", dragLeaveHandler, false);    
 document.addEventListener("drop", dropHandler, false);
 
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    document.addEventListener(eventName, preventDefaults, false)
-  })
+// ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+//     document.addEventListener(eventName, preventDefaults, false)
+//   })
   
 function preventDefaults (e) {
     e.preventDefault()
@@ -127,6 +128,21 @@ function dragOverHandler(ev) {
   
     // Prevent default behavior (Prevent file from being opened)
     ev.preventDefault();
+    ev.stopPropagation();
+
+    // set waveform data-dragging attribute to true
+    const waveform = document.getElementById("waveform");
+    waveform.setAttribute("data-dragging", "true");
+
+}
+
+function dragLeaveHandler(ev) {
+    console.log("File(s) left drop zone");
+    ev.preventDefault();
+
+    // set waveform data-dragging attribute to false
+    const waveform = document.getElementById("waveform");
+    waveform.setAttribute("data-dragging", "false");    
 }
 
 function dropHandler(ev) {
@@ -166,6 +182,10 @@ function dropHandler(ev) {
             
         });
     }
+
+    // set waveform data-dragging attribute to false
+    const waveform = document.getElementById("waveform");
+    waveform.setAttribute("data-dragging", "false");
 }
 
 
@@ -244,13 +264,31 @@ function createWaveform(buffer, file){
         waveColor: '#E5383b',
         progressColor: '#383351',
         url: url,
-      })
+        height: 100,
+      });
+     
+    wavesurfer.on('loading', function (percents) {
+        console.log('loading waveform... ' + percents + '%');
+        // if waveform data-loading is false, set waveform data-loading attribute to true
+        const waveform = document.getElementById("waveform");
+        let isDataLoading = waveform.getAttribute("data-loading");  
+        if(isDataLoading === "false"){
+            waveform.setAttribute("data-loading", "true");
+        }
+    });
+
+    wavesurfer.on('ready', function () {
+        console.log('waveform ready');
+        // if waveform data-loading is true, set waveform data-loading attribute to false
+        const waveform = document.getElementById("waveform");
+        let isDataLoading = waveform.getAttribute("data-loading");  
+        if(isDataLoading === "true"){
+            waveform.setAttribute("data-loading", "false");
+        }
+    });
+};
 
 
-    // wavesurfer.on('ready', function () {
-    //     wavesurfer.play();
-    // });
-}
 
 
 

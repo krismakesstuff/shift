@@ -10,13 +10,16 @@ createToggleButton(fileSection, "loop", buttonCallback);
 createToggleButton(fileSection, "play", buttonCallback);
 
 // create Parent Divs for parameters
-const shiftParentDiv = document.createElement("div");    
+const shiftParentDiv = document.createElement("div");  
+shiftParentDiv.className = "parameter-parent";  
 shiftParentDiv.id = "shift-parent";
 
 const delayParentDiv = document.createElement("div");
+delayParentDiv.className = "parameter-parent";
 delayParentDiv.id = "delay-parent";
 
 const lfoParentDiv = document.createElement("div"); 
+lfoParentDiv.className = "parameter-parent";
 lfoParentDiv.id = "lfo-parent";
 
 // Insert the parent divs into the parameters-section element
@@ -27,45 +30,53 @@ parametersSection.appendChild(lfoParentDiv);
 
 // create sliders
 
+// shift label
+let shiftLabel = document.createElement("div");
+shiftLabel.className = "parameter-label";
+shiftLabel.id = "shift-label";
+shiftLabel.innerHTML = "shift";
+shiftParentDiv.appendChild(shiftLabel);
 // shift parameters
 createSlider(shiftParentDiv, "playbackrate", 0.001, 5, 0.01, sliderCallback);
 createSlider(shiftParentDiv, "shiftamount", 0, 50, 0.01, sliderCallback);
 createSlider(shiftParentDiv, "shiftwindow", 0, 100, 0.01, sliderCallback);
-// shift label
-let shiftLabel = document.createElement("div");
-shiftLabel.id = "shift-label";
-shiftLabel.innerHTML = "shift";
-shiftParentDiv.appendChild(shiftLabel);
 
+// delay label
+let delayLabel = document.createElement("div");
+delayLabel.className = "parameter-label";
+delayLabel.id = "delay-label";
+delayLabel.innerHTML = "delay";
+delayParentDiv.appendChild(delayLabel);
 // delay parameters
 createSlider(delayParentDiv, "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
 createSlider(delayParentDiv, "delayms", 0, 1000, 0.1, sliderCallback);  
 createSlider(delayParentDiv, "delayfeedback", 0, 2.0, 0.01, sliderCallback);
 
-// delay label
-let delayLabel = document.createElement("div");
-delayLabel.id = "delay-label";
-delayLabel.innerHTML = "delay";
-delayParentDiv.appendChild(delayLabel);
-
+// lfo label
+let lfoLabel = document.createElement("div");
+lfoLabel.className = "parameter-label";
+lfoLabel.id = "lfo-label";
+lfoLabel.innerHTML = "lfo panner";
+lfoParentDiv.appendChild(lfoLabel); 
 // lfo parameters
 createSlider(lfoParentDiv, "lfofreq", 0, 15, 0.01, sliderCallback); 
 createSlider(lfoParentDiv, "lfoamount", 0, 1.0, 0.01, sliderCallback);  
 
-// lfo label
-let lfoLabel = document.createElement("div");
-lfoLabel.id = "lfo-label";
-lfoLabel.innerHTML = "lfo";
-lfoParentDiv.appendChild(lfoLabel); 
+
 
 // output section parameters
 let outputDiv = document.getElementById("output-section");
-
-createSlider(outputDiv, "output", 0, 1, 0.01, sliderCallback);
+// output sliders and print button
 createSlider(outputDiv, "wetdry", 0, 1.0, 0.01, sliderCallback);
-createDownloadButton(outputDiv, "print", "output", "output.wav");
+createSlider(outputDiv, "output", 0, 1, 0.01, sliderCallback);
+createPrintButton(outputDiv, "print", "output", "output.wav");
 
 
+// let overlayParent = document.getElementById("overlays");
+// createOverlay(overlayParent, "file-dragging");
+// createOverlay(overlayParent, "printing");
+
+// easy access to sliders   
 let sliders = document.querySelectorAll("input[type=range]");
 
 
@@ -73,15 +84,15 @@ let sliders = document.querySelectorAll("input[type=range]");
 
 
 // create a print button for the output buffer
-function createDownloadButton(parentDiv, name, bufferId, filename) {
+function createPrintButton(parentDiv, name, bufferId, filename) {
     // create outer div
     const outerDiv = document.createElement("div");
-    outerDiv.className = "download-button-container";
-    outerDiv.id = "download-button";
+    outerDiv.className = "button-container";
+    outerDiv.id = "print-button-container";
     
     // create a button element
     const button = document.createElement("button");
-    button.id = "download-button";
+    button.id = "print-button";
     button.textContent = name;
     button.addEventListener("click", () => { download(); });
 
@@ -101,6 +112,7 @@ function createSlider(parentDiv, name, min, max, step, callback) {
     
     // Create a input slider element
     const slider = document.createElement("input");
+    slider.className = "slider";
     slider.type = "range";
     slider.min = min;
     slider.max = max;
@@ -112,11 +124,13 @@ function createSlider(parentDiv, name, min, max, step, callback) {
 
     // Create a label for the slider
     const label = document.createElement("label");
+    label.className = "slider-label";
     label.textContent = name;
     label.htmlFor = name;
 
     // create a number input element that updates the slider value
     const input = document.createElement("input");
+    input.className = "slider-display";
     input.type = "number";
     input.min = min;
     input.max = max;
@@ -187,7 +201,8 @@ function createPresetSelect(parentDiv, presets, presetSelected) {
 
     
     outerDiv.appendChild(select);
-    parentDiv.appendChild(outerDiv);
+    //parentDiv.appendChild(outerDiv);
+    parentDiv.insertBefore(outerDiv, parentDiv.firstChild);
 }
 
 
@@ -307,4 +322,22 @@ function buttonCallback() {
             }
         }
     }
+}
+
+// create Overlay
+function createOverlay(parentDiv, name) {
+    const overlay = document.createElement("div");
+    overlay.id = name + "-overlay";
+    overlay.className = "overlay";
+    overlay.style.appearance = "none";
+    
+    // parentDiv.addEventListener("dragover", (event) => {
+    //     console.log("dragover");
+    //     event.preventDefault();
+    //     overlay.style.display = "block";
+    //     overlay.style.appearance = "auto";
+    // });
+
+    parentDiv.appendChild(overlay);
+    return overlay;
 }
