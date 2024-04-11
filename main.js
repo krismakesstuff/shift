@@ -251,8 +251,25 @@ function loadDroppedFile(){
     }
 }
 
+// update playhead position from playbacksync parameter
+function updatePlayhead(){
+    // if play state is true, get playbacksync parameter value
+    if(device){
+        const playState = device.parametersById.get("play").value;
+        if(playState === 1){
+            const playhead = document.getElementById("playhead");
+            const playbackSync = device.parametersById.get("playbacksync").value;
+            console.log("playbacksync: " + playbackSync);
+        } else {
+            console.log("play state is false");
+        }
+    }
+}
+
 // timer to check if file has been dropped
 setInterval(loadDroppedFile, 1000); 
+// timer to update playhead
+setInterval(updatePlayhead, 60);
 
 
 function createWaveform(buffer, file){
