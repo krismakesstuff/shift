@@ -69,7 +69,7 @@ let outputDiv = document.getElementById("output-section");
 // output sliders and print button
 createSlider(outputDiv, "wetdry", 0, 1.0, 0.01, sliderCallback);
 createSlider(outputDiv, "output", 0, 1, 0.01, sliderCallback);
-createPrintButton(outputDiv, "print", "output", "output.wav");
+createPrintButton(outputDiv, "print", "wetbuffer");
 
 
 // let overlayParent = document.getElementById("overlays");
@@ -84,7 +84,7 @@ let sliders = document.querySelectorAll("input[type=range]");
 
 
 // create a print button for the output buffer
-function createPrintButton(parentDiv, name, bufferId, filename) {
+function createPrintButton(parentDiv, name, bufferId) {
     // create outer div
     const outerDiv = document.createElement("div");
     outerDiv.className = "button-container";
@@ -94,7 +94,7 @@ function createPrintButton(parentDiv, name, bufferId, filename) {
     const button = document.createElement("button");
     button.id = name + "-button";
     button.textContent = name;
-    button.addEventListener("click", () => { printAudioToFile(); });
+    button.addEventListener("click", () => { printAudioToFile(bufferId); });
 
     // Insert the button into the output element
     //const outputSection = document.getElementById("output-section");
@@ -311,8 +311,10 @@ function buttonCallback() {
         if(paramId == "play"){
             if(param.value == 1){
                 this.innerHTML = "stop";
+                startUpdatingPlayhead();
             } else {
                 this.innerHTML = "play";
+                stopUpdatingPlayhead();
             }
         } else if(paramId == "loop") {
             if(param.value == 1){
@@ -325,43 +327,118 @@ function buttonCallback() {
 }
 
 
-// print audio to file
-function printAudioToFile() {
-    console.log("print button clicked");
-    
-    
-    
-    
-    // calculate buffer legnth based off current parameters
-    let bufferLength = getBufferLength();
-
-    // create offline device
-    createOfflineRNBODevice(patchExportURL, bufferLength);
-    
-    offlineDevice.parameters = device.parameters;
-    
-
-    // connect offline device to offline context
-    offlineDevice.node.connect(offlineContext.destination);
-
-    // start rendering
-    offlineContext.startRendering().then(function(renderedBuffer){
-        console.log("rendering complete");
-        // create audio buffer source
-        let source = offlineContext.createBufferSource();
-        source.buffer = renderedBuffer;
-        source.connect(offlineContext.destination);
-        source.start();
-    });
-}
-
-
 // -------  Helper Functions  ------- //
 
-// get buffer length based off current parameters
-function getBufferLength() {
-
+// print audio to file
+function printAudioToFile(bufferId) {
+    console.log("print button clicked");
     
+    //var wetbuffer;
+
+    if(device.isValid){       
+        console.log("RNBO device found in printAudioToFile " + device.node); 
+        console.log("numChannels: " + device.numOutputChannels);
+        function getBufferFromLiveDevice(device) {
+            return new Promise((resolve, reject) => {
+                device.releaseDataBuffer(bufferId)
+                    .then((rnbobuffer) => {
+                        let ab = rnbobuffer.getAsAudioBuffer(device.context);
+                        console.log("wetbuffer found in RNBO device: " + ab.length + " samples");
+                        resolve(ab);
+                    }).catch((error) => {
+                        console.log("error getting buffer: " + error);
+                        reject(error);
+                    }); 
+            });
+        }
+
+        getBufferFromLiveDevice(device)
+            .then((buffer) => {
+                console.log("buffer found");
+                // calculate buffer legnth based off current parameters
+                let bufferLength = getBufferLengthInSamples(buffer);
+                
+                // create offline device, wrap in promise to wait for device to be created
+                const offlineDevice = function(bufferLength, device) {
+                    return new Promise((resolve, reject) => {
+                        createOfflineContextAndRNBODevice(patchExportURL, bufferLength)
+                        .then((offlineDevice) => {
+                            // pass current device parameters to offline device
+                            offlineDevice.parameters = device.parameters;
+                            offlineDevice.setDataBuffer('wetbuffer', buffer);
+                            offlineDevice.setDataBuffer('drybuffer', buffer);
+                            console.log("offline device created");
+                            resolve(offlineDevice);
+                        }).catch((error) => {
+                            console.log("error creating offline device: " + error);
+                            reject(error);
+                        });
+                    });
+                }
+                    
+                
+                
+                offlineDevice(bufferLength, device).then((offlineDevice) => {
+                    
+                    
+                    // connect offline device to offline context
+                    offlineDevice.node.connect(offlineDevice.context.destination);
+                    
+
+
+                    console.log("offline device connected to context");
+                    console.log("offline device: " + offlineDevice.node);
+                    console.log("offline context: " + offlineDevice.context);
+                    
+                    offlineDevice.parametersById.get("play").value = 1;
+
+                    for(let i = 0; i < offlineDevice.parameters.length; i++){
+                        console.log("offline device parameter: " + offlineDevice.parameters[i].name);
+                        console.log("offline device parameter value: " + offlineDevice.parameters[i].value)
+                    }
+
+
+                    // start rendering
+                    offlineDevice.context.startRendering()
+                    .then(function(renderedBuffer){
+                        console.log("rendering complete");
+                        console.log("rendered buffer: " + renderedBuffer);
+                        // make download link
+                        make_download(renderedBuffer, bufferLength);
+                    });
+                    }).catch((error) => {
+                        console.log("error rendering offline device: " + error);
+                });
+
+            }).catch((error) => {
+                console.log("error getting buffer from device: " + error);
+            });   
+        
+        
+        
+
+    } else {
+        console.log("no RNBO device found in printAudioToFile");
+    }
+
+
+}
+
+// get buffer length based off current parameters
+function getBufferLengthInSamples(wetbuffer) {
+
+    console.log("buffer passed: " + wetbuffer);
+
+    let currentBufferLength;
+
+    if(wetbuffer.length > 0){
+        currentBufferLength = wetbuffer.length;
+    } else {
+        console.log("no buffer size, when calculating buffer length");
+        currentBufferLength = 0;
+    }
+
+    let bufferLength;
     let playbackrate = device.parametersById.get("playbackrate").value;
     let shiftamount = device.parametersById.get("shiftamount").value;
     let shiftwindow = device.parametersById.get("shiftwindow").value;
@@ -374,16 +451,113 @@ function getBufferLength() {
 
     // calculate buffer length in seconds
     
-    
-    // get parameter values by id
-    // let playbackrate = parameters.get("playbackrate").value;
-    
-
-    // calculate buffer length
-
-
-    
-
+    bufferLength = currentBufferLength; // temp buffer length 
 
     return bufferLength;
 }
+
+// vvvv  NOT MY CODE vvvv
+// Credit to: https://russellgood.com/how-to-convert-audiobuffer-to-audio-file/
+
+// Convert an AudioBuffer to a Blob using WAVE representation
+function bufferToWave(abuffer, len) {
+    var numOfChan = abuffer.numberOfChannels,
+        length = len * numOfChan * 2 + 44,
+        buffer = new ArrayBuffer(length),
+        view = new DataView(buffer),
+        channels = [], 
+        i, 
+        sample,
+        offset = 0,
+        pos = 0;
+  
+    // write WAVE header
+    setUint32(0x46464952);                         // "RIFF"
+    setUint32(length - 8);                         // file length - 8
+    setUint32(0x45564157);                         // "WAVE"
+  
+    setUint32(0x20746d66);                         // "fmt " chunk
+    setUint32(16);                                 // length = 16
+    setUint16(1);                                  // PCM (uncompressed)
+    setUint16(numOfChan);
+    setUint32(abuffer.sampleRate);
+    setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
+    setUint16(numOfChan * 2);                      // block-align
+    setUint16(16);                                 // 16-bit (hardcoded in this demo)
+  
+    setUint32(0x61746164);                         // "data" - chunk
+    setUint32(length - pos - 4);                   // chunk length
+  
+    console.log("BufferToWave: " + abuffer);
+    console.log("-length: " + abuffer.length);
+    console.log("-sampleRate: " + abuffer.sampleRate);
+    console.log("-numberOfChannels: " + abuffer.numberOfChannels);
+
+
+
+    // write interleaved data
+    for(i = 0; i < abuffer.numberOfChannels; i++)
+      channels.push(abuffer.getChannelData(i));
+  
+    while(pos < length) {
+      for(i = 0; i < numOfChan; i++) {             // interleave channels
+        sample = Math.max(-1, Math.min(1, channels[i][offset])); // clamp
+        //sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0; // scale to 16-bit signed int
+        view.setInt16(pos, sample, true);          // write 16-bit sample
+        //console.log("channel " + i + " set pos " + pos + " to sample " + sample);
+        pos += 2;
+      }
+      offset++                                     // next source sample
+    }
+  
+    // create Blob
+    let blob = new Blob([buffer], {type: "audio/wav"});
+    console.log("Blob: " + blob.type + " " + blob.size + " bytes");
+    return blob;
+    //return new Blob([buffer], {type: "audio/wav"});
+  
+    function setUint16(data) {
+      view.setUint16(pos, data, true);
+      pos += 2;
+    }
+  
+    function setUint32(data) {
+      view.setUint32(pos, data, true);
+      pos += 4;
+    }
+}
+
+function make_download(abuffer, total_samples) {
+
+    // get duration and sample rate
+    var duration = abuffer.duration,
+        rate = abuffer.sampleRate,
+        offset = 0;
+
+    var new_file = URL.createObjectURL(bufferToWave(abuffer, total_samples));
+
+    // var name = generateFileName();
+    // var download_link = document.getElementById("download_link");
+    // download_link.href = new_file;
+    // download_link.download = name;
+
+    window.open(new_file);
+
+}
+
+function generateFileName() {
+//   var origin_name = fileInput.files[0].name;
+//   var pos = origin_name.lastIndexOf('.');
+//   var no_ext = origin_name.slice(0, pos);
+
+//   return no_ext + ".compressed.wav";
+
+    return "output.wav";
+}
+
+
+
+
+// ------ Waveform Overlay ------ //
+
+

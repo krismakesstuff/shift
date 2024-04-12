@@ -213,6 +213,17 @@ body{
     background-color: var(--color-light-grey);
 }
 
+#waveform-overlay{
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-dark-transparent);
+    border-radius: var(--border-radius-small);
+    padding: 10px;
+
+}
+
 
 
 #parameters-section {

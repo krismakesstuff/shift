@@ -95,13 +95,16 @@ async function createRNBODevice(patchExportURL, offline) {
 }
 
 // create offline rnbo device
-async function createOfflineRNBODevice(patchExportURL, bufferLength) {
+async function createOfflineContextAndRNBODevice(patchExportURL, bufferLength) {
     // Create OfflineAudioContext
     const numChans = 2;
     const sampleRate = 44100;
 
     const offlineContext = new OfflineAudioContext(numChans, bufferLength, sampleRate);
 
+    // Create gain node and connect it to audio output
+    const outputNode = offlineContext.createGain();
+    outputNode.connect(offlineContext.destination);
 
     // Fetch the exported patcher
     let response, patcher;
@@ -140,6 +143,8 @@ async function createOfflineRNBODevice(patchExportURL, bufferLength) {
         console.error(err);
         throw err;
     }
+
+    return device;
 
 }
 

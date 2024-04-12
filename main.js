@@ -42,9 +42,6 @@ async function createOfflineRNBO() {
 // We can't await here because it's top level, so we have to check later
 // if device and context have been assigned
 setupRNBO();
-//createOfflineRNBO();
-
-
 
 // Fetch the exported patcher
 
@@ -207,27 +204,30 @@ async function loadAudioFile(audioFile){
 
     reader.onload = function(e) {
         context.decodeAudioData(e.target.result).then(function(buffer) {
-            // var source = context.createBufferSource();
-            // source.buffer = buffer;
+            let loadWaveform = true;
 
             bufferDescs.forEach((desc) => {
                 if(!!desc.file){
                     console.log("buffer with id: " + desc.id + " -references file: " + desc.file);
                 } else {
                     if(device){
-        
+
+                        // load decodedAudioData into device buffer
                         device.setDataBuffer(desc.id, buffer);
+        
+                        // we are loading two buffers, but only want to create the waveform once
+                        if(loadWaveform){
+                            // if waveform has children already created, remove them and create new children for new waveform
+                            const waveformDiv = document.getElementById("waveform");
+                            while (waveformDiv.firstChild) {
+                                waveformDiv.removeChild(waveformDiv.firstChild);
+                                
+                            }
+    
+                            createWaveform(buffer, audioFile);
+                            loadWaveform = false;
 
-
-                        // if waveform has children already created, remove them and create new children for new waveform
-                        const waveformDiv = document.getElementById("waveform");
-                        while (waveformDiv.firstChild) {
-                            waveformDiv.removeChild(waveformDiv.firstChild);
-                            
                         }
-
-                        createWaveform(buffer, audioFile);
-
                         console.log(`loaded audio file into buffer with id ${desc.id}`);
         
                     }
@@ -251,6 +251,18 @@ function loadDroppedFile(){
     }
 }
 
+// called by play button
+function startUpdatingPlayhead(){
+    console.log("start updating playhead");
+    setInterval(updatePlayhead, 60);
+}
+// called by play button
+function stopUpdatingPlayhead(){
+    console.log("stop updating playhead");
+    clearInterval(updatePlayhead);
+}
+
+
 // update playhead position from playbacksync parameter
 function updatePlayhead(){
     // if play state is true, get playbacksync parameter value
@@ -259,23 +271,24 @@ function updatePlayhead(){
         if(playState === 1){
             const playhead = document.getElementById("playhead");
             const playbackSync = device.parametersById.get("playbacksync").value;
-            console.log("playbacksync: " + playbackSync);
+
+            // TODO: connect to canvas
+            
+            //console.log("playbacksync: " + playbackSync);
         } else {
-            console.log("play state is false");
+            //console.log("play state is false");
         }
     }
 }
 
 // timer to check if file has been dropped
 setInterval(loadDroppedFile, 1000); 
-// timer to update playhead
-setInterval(updatePlayhead, 60);
 
 
 function createWaveform(buffer, file){
 
     const url = URL.createObjectURL(file);
-
+    //const dummyMedia = new HTMLMediaElement();
     const wavesurfer = WaveSurfer.create({
         container: '#waveform',
         waveColor: '#E5383b',
@@ -287,6 +300,7 @@ function createWaveform(buffer, file){
     wavesurfer.on('loading', function (percents) {
         console.log('loading waveform... ' + percents + '%');
         // if waveform data-loading is false, set waveform data-loading attribute to true
+        // TODO: connect to overaly
         const waveform = document.getElementById("waveform");
         let isDataLoading = waveform.getAttribute("data-loading");  
         if(isDataLoading === "false"){
