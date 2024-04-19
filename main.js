@@ -233,7 +233,7 @@ async function loadAudioFile(audioFile){
                     }
                 }
             });
-            console.log("Decoded audio data from file" + buffer.length);
+            console.log("Decoded audio data from file, length: " + buffer.length);
 
         });
     }
@@ -286,41 +286,49 @@ setInterval(loadDroppedFile, 1000);
 
 
 function createWaveform(buffer, file){
+    console.log("creating waveform");
+    if(device){
 
-    const url = URL.createObjectURL(file);
-    //const dummyMedia = new HTMLMediaElement();
-    const wavesurfer = WaveSurfer.create({
-        container: '#waveform',
-        waveColor: '#E5383b',
-        progressColor: '#383351',
-        url: url,
-        height: 100,
-       // media:
-      });
-     
-    wavesurfer.on('loading', function (percents) {
-        console.log('loading waveform... ' + percents + '%');
-        // if waveform data-loading is false, set waveform data-loading attribute to true
-        // TODO: connect to overaly
-        const waveform = document.getElementById("waveform");
-        let isDataLoading = waveform.getAttribute("data-loading");  
-        if(isDataLoading === "false"){
-            waveform.setAttribute("data-loading", "true");
-            waveform.innerHTML = "loading waveform... " + percents + "%";
-            waveform.style.zIndex = 1;
-        }
-    });
+        const url = URL.createObjectURL(file);
+        const newSource = device.context.createMediaElementSource(new Audio(url));
+        console.log("new source: " + newSource);
+        newSource.connect(device.context.destination);
 
-    wavesurfer.on('ready', function () {
-        console.log('waveform ready');
-        // if waveform data-loading is true, set waveform data-loading attribute to false
-        const waveform = document.getElementById("waveform");
-        let isDataLoading = waveform.getAttribute("data-loading");  
-        if(isDataLoading === "true"){
-            waveform.setAttribute("data-loading", "false");
-            waveform.innerHTML = "";
-        }
-    });
+        //const dummyMedia = new HTMLMediaElement();
+        const wavesurfer = WaveSurfer.create({
+            container: '#waveform',
+            waveColor: '#E5383b',
+            progressColor: '#383351',
+            //url: url,
+            height: 100,
+            media: newSource,
+        });
+        
+        wavesurfer.on('loading', function (percents) {
+            console.log('loading waveform... ' + percents + '%');
+            // if waveform data-loading is false, set waveform data-loading attribute to true
+            // TODO: connect to overaly
+            const waveform = document.getElementById("waveform");
+            let isDataLoading = waveform.getAttribute("data-loading");  
+            if(isDataLoading === "false"){
+                waveform.setAttribute("data-loading", "true");
+                waveform.innerHTML = "loading waveform... " + percents + "%";
+                waveform.style.zIndex = 1;
+            }
+        });
+        
+        wavesurfer.on('ready', function () {
+            console.log('waveform ready');
+            // if waveform data-loading is true, set waveform data-loading attribute to false
+            const waveform = document.getElementById("waveform");
+            let isDataLoading = waveform.getAttribute("data-loading");  
+            if(isDataLoading === "true"){
+                waveform.setAttribute("data-loading", "false");
+                waveform.innerHTML = "";
+            }
+            wavesurfer.play();
+        });
+    }
 };
 
 
