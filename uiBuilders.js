@@ -94,7 +94,7 @@ function createPrintButton(parentDiv, name, bufferId) {
     const button = document.createElement("button");
     button.id = name + "-button";
     button.textContent = name;
-    button.addEventListener("click", () => { printAudioToFile(bufferId); });
+    //button.addEventListener("click", () => { printAudioToFile(bufferId); });
 
     // Insert the button into the output element
     //const outputSection = document.getElementById("output-section");
@@ -396,7 +396,6 @@ function printAudioToFile(bufferId) {
                         console.log("offline device parameter: " + offlineDevice.parameters[i].name);
                         console.log("offline device parameter value: " + offlineDevice.parameters[i].value)
                     }
-
 
                     // start rendering
                     offlineDevice.context.startRendering()

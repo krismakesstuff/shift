@@ -9,10 +9,10 @@ pitch shifter -> ping-pong delay -> lfo panner.
 
 
 # todo: 
--
-- finish print button, see: https://russellgood.com/how-to-convert-audiobuffer-to-audio-file/
-- make waveform overlay display, see: https://css-tricks.com/making-an-audio-waveform-visualizer-with-vanilla-javascript/ 
+- CHANGE: use web audio context to hold buffer and input audio into rnbo device. Get rid of wet and dry buffer and handle in js. This also allows for mic input and easier configuration with wavesurfer. 
+- createMediaElementSource from audiocontext and pass to wavesurfer. 
+- change max patch to accept audio input, instead of relying on the wet and dry buffers. 
+- move wet and dry functionality to be handled in js.
+- fix delay routing. It is going through the lfo and lfo amount is determining how loud the delay is. FIX.
 - custom sliders
 - midi input?
-- add method to record with device microphone to fill buffer?
-- fft visual manipulates three.js background?

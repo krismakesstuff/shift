@@ -273,7 +273,7 @@ function updatePlayhead(){
             const playbackSync = device.parametersById.get("playbacksync").value;
 
             // TODO: connect to canvas
-            
+
             //console.log("playbacksync: " + playbackSync);
         } else {
             //console.log("play state is false");
@@ -295,6 +295,7 @@ function createWaveform(buffer, file){
         progressColor: '#383351',
         url: url,
         height: 100,
+       // media:
       });
      
     wavesurfer.on('loading', function (percents) {
