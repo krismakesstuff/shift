@@ -8,6 +8,7 @@ let fileSection = document.getElementById("file-section");
 
 createToggleButton(fileSection, "loop", buttonCallback);
 createToggleButton(fileSection, "play", buttonCallback);
+createToggleButton(fileSection, "mic", buttonCallback);
 
 // create Parent Divs for parameters
 const shiftParentDiv = document.createElement("div");  
@@ -25,8 +26,8 @@ lfoParentDiv.id = "lfo-parent";
 // Insert the parent divs into the parameters-section element
 const parametersSection = document.getElementById("parameters-section");
 parametersSection.appendChild(shiftParentDiv);
-parametersSection.appendChild(delayParentDiv);
 parametersSection.appendChild(lfoParentDiv);
+parametersSection.appendChild(delayParentDiv);
 
 // create sliders
 
@@ -41,6 +42,16 @@ createSlider(shiftParentDiv, "playbackrate", 0.001, 5, 0.01, sliderCallback);
 createSlider(shiftParentDiv, "shiftamount", 0, 50, 0.01, sliderCallback);
 createSlider(shiftParentDiv, "shiftwindow", 0, 100, 0.01, sliderCallback);
 
+// lfo label
+let lfoLabel = document.createElement("div");
+lfoLabel.className = "parameter-label";
+lfoLabel.id = "lfo-label";
+lfoLabel.innerHTML = "lfo panner";
+lfoParentDiv.appendChild(lfoLabel); 
+// lfo parameters
+createSlider(lfoParentDiv, "lfofreq", 0, 15, 0.01, sliderCallback); 
+createSlider(lfoParentDiv, "lfoamount", 0, 1.0, 0.01, sliderCallback);  
+
 // delay label
 let delayLabel = document.createElement("div");
 delayLabel.className = "parameter-label";
@@ -52,15 +63,6 @@ createSlider(delayParentDiv, "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
 createSlider(delayParentDiv, "delayms", 0, 1000, 0.1, sliderCallback);  
 createSlider(delayParentDiv, "delayfeedback", 0, 2.0, 0.01, sliderCallback);
 
-// lfo label
-let lfoLabel = document.createElement("div");
-lfoLabel.className = "parameter-label";
-lfoLabel.id = "lfo-label";
-lfoLabel.innerHTML = "lfo panner";
-lfoParentDiv.appendChild(lfoLabel); 
-// lfo parameters
-createSlider(lfoParentDiv, "lfofreq", 0, 15, 0.01, sliderCallback); 
-createSlider(lfoParentDiv, "lfoamount", 0, 1.0, 0.01, sliderCallback);  
 
 
 
@@ -161,6 +163,7 @@ function createToggleButton(parentDiv, name, callback) {
     // create a button element
     const button = document.createElement("button");
     button.id = name + "-button";
+    button.dataset.state = "off";
     button.textContent = name;
     button.addEventListener("click", callback);
 
@@ -299,23 +302,27 @@ function buttonCallback() {
     console.log(`Button ${buttonId} clicked`);
     var paramId = buttonId.replace('-button','');
 
-    // set parameter in device
-    if(device){
-        const param = device.parametersById.get(paramId);
-        let currentValue = param.value;
-        param.value = !currentValue;
-        console.log(`${buttonId}: parameter ${paramId} set to: ${param.value}`);
+    // get button state and toogle
+    this.dataset.state = this.dataset.state === "off" ? "on" : "off";
 
-        // update button text
-        
-        if(paramId == "play"){
-            if(param.value == 1){
-                this.innerHTML = "stop";
-                startUpdatingPlayhead();
-            } else {
-                this.innerHTML = "play";
-                stopUpdatingPlayhead();
-            }
+    if(paramId == "mic"){   
+        toggleMicInput();
+    } else if(device){
+            const param = device.parametersById.get(paramId);
+            let currentValue = param.value;
+            param.value = !currentValue;
+            console.log(`${buttonId}: parameter ${paramId} set to: ${param.value}`);
+            
+            // update button text
+            
+            if(paramId == "play"){
+                if(param.value == 1){
+                    this.innerHTML = "stop";
+                    startUpdatingPlayhead();
+                } else {
+                    this.innerHTML = "play";
+                    stopUpdatingPlayhead();
+                }
         } else if(paramId == "loop") {
             if(param.value == 1){
                 this.innerHTML = "stop looping";

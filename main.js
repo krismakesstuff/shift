@@ -16,16 +16,7 @@ async function setupRNBO() {
 
     if(!device) {
         console.log("Device not found");
-    } else {
-        // move this to be button activated
-        window.navigator.mediaDevices.getUserMedia({ audio:  {
-            channelCount: 1,
-            volume: 1.0,
-            echoCancellation: false,
-            noiseSuppression: false,
-          }, video: false })
-    .then(handleSuccess);
-    }
+    } 
 
 }
 
@@ -35,13 +26,39 @@ async function setupRNBO() {
 // if device and context have been assigned
 setupRNBO();
 
-const handleSuccess = (stream) => {
-    const source = context.createMediaStreamSource(stream);
-    source.connect(device.node);
+// min input functions 
+let micSourceNode;
+
+const connectMicStream = (stream) => {
+    micSourceNode = context.createMediaStreamSource(stream);
+    micSourceNode.connect(device.node);
     console.log("connected microphone to device");
+    console.log(micSourceNode);    
 }
 
+const disconnectMicStream = () => {
+    console.log("disconnecting microphone from device");
+    micSourceNode.disconnect(device.node);
+    micSourceNode = null;
+}
 
+// get microphone input
+function toggleMicInput(){
+    // check if mic is already connected
+    if(micSourceNode){
+        // if mic is connected, disconnect it
+        disconnectMicStream();
+    }else{
+        // if mic is not connected, connect it
+        navigator.mediaDevices.getUserMedia({ audio:  {
+            channelCount: 1,
+            volume: 1.0,
+            echoCancellation: false,
+            noiseSuppression: false,
+        }, video: false })
+        .then(connectMicStream); 
+    }  
+}
 
 
 // File drop zone, adding and defining event listeners
