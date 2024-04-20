@@ -9,7 +9,6 @@ pitch shifter -> ping-pong delay -> lfo panner.
 
 
 # todo: 
-- createMediaElementSource from audiocontext and pass to wavesurfer. 
 - when playing dropped file, make sure to account for mono and stereo. 
 - move wet and dry functionality to be handled in js.
 - fix preset select
