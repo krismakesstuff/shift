@@ -522,6 +522,32 @@
           "value": 1
         }
       }
+    },
+    {
+      "name": "chorus-pingpong",
+      "preset": {
+        "delayfeedback": {
+          "value": 0.3858267716535433
+        },
+        "delayms": {
+          "value": 299
+        },
+        "lfoamount": {
+          "value": 0.6692913385826772
+        },
+        "lfofreq": {
+          "value": 1.5444094488188977
+        },
+        "shiftamount": {
+          "value": 3
+        },
+        "shiftdelaysend": {
+          "value": 0.5118110236220472
+        },
+        "shiftwindow": {
+          "value": 7
+        }
+      }
     }
   ],
   "src": [

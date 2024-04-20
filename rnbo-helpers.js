@@ -19,8 +19,10 @@ async function createRNBODevice(patchExportURL, offline) {
     
     // Create gain node and connect it to audio output
     const outputNode = context.createGain();
-    outputNode.connect(context.destination);
     
+    
+    outputNode.connect(context.destination);
+
     // Fetch the exported patcher
     let response, patcher;
     try {
@@ -94,59 +96,6 @@ async function createRNBODevice(patchExportURL, offline) {
     return [device, context];
 }
 
-// create offline rnbo device
-async function createOfflineContextAndRNBODevice(patchExportURL, bufferLength) {
-    // Create OfflineAudioContext
-    const numChans = 2;
-    const sampleRate = 44100;
-
-    const offlineContext = new OfflineAudioContext(numChans, bufferLength, sampleRate);
-
-    // Create gain node and connect it to audio output
-    const outputNode = offlineContext.createGain();
-    outputNode.connect(offlineContext.destination);
-
-    // Fetch the exported patcher
-    let response, patcher;
-    try {
-        response = await fetch(patchExportURL);
-        patcher = await response.json();
-        
-        if (!window.RNBO) {
-            // Load RNBO script dynamically
-            // Note that you can skip this by knowing the RNBO version of your patch
-            // beforehand and just include it using a <script> tag
-            await loadRNBOScript(patcher.desc.meta.rnboversion);
-        }
-
-    } catch (err) {
-        const errorContext = {
-            error: err
-        };
-
-        if (response && (response.status >= 300 || response.status < 200)) {
-            errorContext.header = `Couldn't load patcher export bundle`,
-            errorContext.description = `Check app.js to see what file it's trying to load. Currently it's` +
-            ` trying to load "${patchExportURL}". If that doesn't` +
-            ` match the name of the file you exported from RNBO, modify` +
-            ` patchExportURL in app.js.`;
-        }
-        throw err;
-    }
-
-    // Create the device
-    let device;
-    try {
-        device = await RNBO.createDevice({ context: offlineContext, patcher });
-        console.log("Offline RNBO Device Created");
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
-
-    return device;
-
-}
 
         
 function loadRNBOScript(version) {
