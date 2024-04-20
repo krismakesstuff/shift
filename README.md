@@ -13,6 +13,7 @@ pitch shifter -> ping-pong delay -> lfo panner.
 - when playing dropped file, make sure to account for mono and stereo. 
 - move wet and dry functionality to be handled in js.
 - fix preset select
+- fix number input
 - custom slider colors
 - keep playback rate parameter for loaded files?
 - midi input?

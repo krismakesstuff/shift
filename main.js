@@ -113,9 +113,6 @@ function dropHandler(ev) {
                 console.log(`file found: file[${i}].name = ${file.name}`);
                 // check if file is audio file and insert audio player if it is
                 if(file.type.startsWith("audio")){
-                    //insertAudioPlayer(file);
-                    
-                    //loadAudioFile(file);
                     
                     droppedFile = file;
                     getDroppedFile = true;
@@ -160,35 +157,7 @@ async function loadAudioFile(audioFile){
 
     reader.onload = function(e) {
         context.decodeAudioData(e.target.result).then(function(buffer) {
-            let loadWaveform = true;
-
-            bufferDescs.forEach((desc) => {
-                if(!!desc.file){
-                    console.log("buffer with id: " + desc.id + " -references file: " + desc.file);
-                } else {
-                    if(device){
-
-                        // load decodedAudioData into device buffer
-                        device.setDataBuffer(desc.id, buffer);
-        
-                        // we are loading two buffers, but only want to create the waveform once
-                        if(loadWaveform){
-                            // if waveform has children already created, remove them and create new children for new waveform
-                            const waveformDiv = document.getElementById("waveform");
-                            while (waveformDiv.firstChild) {
-                                waveformDiv.removeChild(waveformDiv.firstChild);
-                                
-                            }
-    
-                            createWaveform(buffer, audioFile);
-                            loadWaveform = false;
-
-                        }
-                        console.log(`loaded audio file into buffer with id ${desc.id}`);
-        
-                    }
-                }
-            });
+            createWaveform(buffer, audioFile);
             console.log("Decoded audio data from file, length: " + buffer.length);
 
         });
@@ -245,19 +214,20 @@ function createWaveform(buffer, file){
     console.log("creating waveform");
     if(device){
 
+        const audioElement = document.getElementById("audio");
         const url = URL.createObjectURL(file);
-        const newSource = device.context.createMediaElementSource(new Audio(url));
+        audioElement.src = url;
+        const newSource = device.context.createMediaElementSource(audioElement);
         console.log("new source: " + newSource);
-        newSource.connect(device.context.destination);
+        newSource.connect(device.node);
+        //device.node.connect(newSource);
 
-        //const dummyMedia = new HTMLMediaElement();
         const wavesurfer = WaveSurfer.create({
             container: '#waveform',
             waveColor: '#E5383b',
             progressColor: '#383351',
-            //url: url,
             height: 100,
-            media: newSource,
+            media: audioElement,
         });
         
         wavesurfer.on('loading', function (percents) {
@@ -283,6 +253,10 @@ function createWaveform(buffer, file){
                 waveform.innerHTML = "";
             }
             wavesurfer.play();
+        });
+
+        wavesurfer.on('error', function (err) {
+            console.error(err);
         });
     }
 };

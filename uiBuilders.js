@@ -304,33 +304,24 @@ function buttonCallback() {
 
     // get button state and toogle
     this.dataset.state = this.dataset.state === "off" ? "on" : "off";
+    let newState = this.dataset.state;
 
     if(paramId == "mic"){   
         toggleMicInput();
-    } else if(device){
-            const param = device.parametersById.get(paramId);
-            let currentValue = param.value;
-            param.value = !currentValue;
-            console.log(`${buttonId}: parameter ${paramId} set to: ${param.value}`);
-            
-            // update button text
-            
-            if(paramId == "play"){
-                if(param.value == 1){
-                    this.innerHTML = "stop";
-                    startUpdatingPlayhead();
-                } else {
-                    this.innerHTML = "play";
-                    stopUpdatingPlayhead();
-                }
-        } else if(paramId == "loop") {
-            if(param.value == 1){
-                this.innerHTML = "stop looping";
-            } else {
-                this.innerHTML = "loop";
-            }
+    } else if(paramId == "play"){
+        if(newState == "on"){
+            this.innerHTML = "stop";
+        } else {
+            this.innerHTML = "play";
+        }
+    } else if(paramId == "loop") {
+        if(newState == "on"){
+            this.innerHTML = "looping";
+        } else {
+            this.innerHTML = "loop";
         }
     }
+    
 }
 
 
