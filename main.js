@@ -1,5 +1,7 @@
 console.log('main.js');
 
+//import {RegionsPlugin} from "https://unpkg.com/wavesurfer.js@7.7.11/dist/plugins/plugins/regions.d.ts";
+
 let bufferDescs;
 
 const sampleRate = 44100;
@@ -17,6 +19,8 @@ async function setupRNBO() {
     if(!device) {
         console.log("Device not found");
     } 
+
+    createWaveform();
 
 }
 
@@ -139,97 +143,94 @@ function dropHandler(ev) {
 }
 
 
-// insert audio player with audio controls
-function insertAudioPlayer(audioFile){
-    console.log("inserting audio player");
-    let audioPlayer = document.createElement("audio");
-    audioPlayer.controls = true;
-    audioPlayer.src = URL.createObjectURL(audioFile);
-    dropZone.appendChild(audioPlayer);
-}
 
-
-
-// load file into wetbuffer and drybuffer in rnbbo device
-async function loadAudioFile(audioFile){
-    
-    var reader = new FileReader();
-
-    reader.onload = function(e) {
-        context.decodeAudioData(e.target.result).then(function(buffer) {
-            createWaveform(buffer, audioFile);
-            console.log("Decoded audio data from file, length: " + buffer.length);
-
-        });
-    }
-
-    reader.readAsArrayBuffer(audioFile);
-
-
-}
 
 // if getDropFile is true, load audio file into buffers
 function loadDroppedFile(){
     if(getDroppedFile){
-        loadAudioFile(droppedFile);
+        
+        // var reader = new FileReader();
+        // reader.onload = function(e) {
+        //     context.decodeAudioData(e.target.result).then(function(buffer) {
+        //         createWaveform(buffer, droppedFile);
+                
+        //         console.log("Decoded audio data from file, length: " + buffer.length);
+
+        //     });
+        // }
+        // reader.readAsArrayBuffer(droppedFile);
+        
+
+        updateWaveform(droppedFile);
+
         getDroppedFile = false;
     }
 }
 
-// called by play button
-function startUpdatingPlayhead(){
-    console.log("start updating playhead");
-    setInterval(updatePlayhead, 60);
-}
-// called by play button
-function stopUpdatingPlayhead(){
-    console.log("stop updating playhead");
-    clearInterval(updatePlayhead);
-}
 
-
-// update playhead position from playbacksync parameter
-function updatePlayhead(){
-    // if play state is true, get playbacksync parameter value
-    if(device){
-        const playState = device.parametersById.get("play").value;
-        if(playState === 1){
-            const playhead = document.getElementById("playhead");
-            const playbackSync = device.parametersById.get("playbacksync").value;
-
-            // TODO: connect to canvas
-
-            //console.log("playbacksync: " + playbackSync);
-        } else {
-            //console.log("play state is false");
-        }
-    }
-}
 
 // timer to check if file has been dropped
 setInterval(loadDroppedFile, 1000); 
+
+//let wetSource;
+//let drySource;
+
+let wavesurfer; 
+const audioElement = document.getElementById("audio");
+
+//let wsRegions;
+
+function updateWaveform(file){
+
+    const url = URL.createObjectURL(file);
+    audioElement.src = url;
+    console.log("new audio src: " + url);
+
+    // update wavesurfer?
+    wavesurfer.load(url);
+}
 
 
 function createWaveform(buffer, file){
     console.log("creating waveform");
     if(device){
 
-        const audioElement = document.getElementById("audio");
-        const url = URL.createObjectURL(file);
-        audioElement.src = url;
-        const newSource = device.context.createMediaElementSource(audioElement);
-        console.log("new source: " + newSource);
-        newSource.connect(device.node);
+        // const audioElement = document.getElementById("audio");
+        // const url = URL.createObjectURL(file);
+        // audioElement.src = url;
+        // const newSource = device.context.createMediaElementSource(audioElement);
+        // console.log("new source: " + newSource);
+        
+        //drySource = newSource;
+
+        //drySource.connect(device.node);
+        //newSource.connect(device.node);
         //device.node.connect(newSource);
 
-        const wavesurfer = WaveSurfer.create({
+        // wavesurfer = WaveSurfer.create({
+        //     container: '#waveform',
+        //     waveColor: '#E5383b',
+        //     progressColor: '#383351',
+        //     height: 100,
+        //     media: audioElement,
+        // });
+       
+        // REGIONS NOT WORKING YET
+        // wsRegions = wavesurfer.registerPlugin(Wavesurfer.RegionsPlugin.create());
+        // wsRegions.enableDragSelection();
+
+        const newSource = device.context.createMediaElementSource(audioElement);
+        newSource.connect(device.node);
+        
+        wavesurfer = WaveSurfer.create({
             container: '#waveform',
             waveColor: '#E5383b',
             progressColor: '#383351',
             height: 100,
             media: audioElement,
-        });
+        });;
         
+
         wavesurfer.on('loading', function (percents) {
             console.log('loading waveform... ' + percents + '%');
             // if waveform data-loading is false, set waveform data-loading attribute to true
@@ -252,12 +253,27 @@ function createWaveform(buffer, file){
                 waveform.setAttribute("data-loading", "false");
                 waveform.innerHTML = "";
             }
-            wavesurfer.play();
+            // start
+            // wavesurfer.play();
+            // // update play-button state
+            // let playButton = document.getElementById("play-button");
+            // playButton.click();
         });
 
-        wavesurfer.on('error', function (err) {
-            console.error(err);
-        });
+        // hacky way to loop when done playing
+        wavesurfer.on('finish', function (){
+            console.log('waveform finished');
+            // get state from loop-button
+            let loopButton = document.getElementById("loop-button");
+            let isLooping = loopButton.dataset.state;
+            if(isLooping === "on"){
+                wavesurfer.play();
+            } else {
+                let playButton = document.getElementById("play-button");
+                playButton.click();
+            }
+        })
+
     }
 };
 

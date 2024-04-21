@@ -3,16 +3,14 @@
 development in progress
 
 #### a resampler
-upload audio files and apply these effects:  
-pitch shifter -> ping-pong delay -> lfo panner. 
+send audio (mic or file) to this effects chain:  
+pitch shifter -> lfo panner -> ping-pong delay. 
 
 
 
 # todo: 
 - when playing dropped file, make sure to account for mono and stereo. 
-- move wet and dry functionality to be handled in js.
-- fix preset select
-- fix number input
+- reset prest values now that min and maxes have changed
+- change print button to record and add wavesurfer instance when recording
 - custom slider colors
-- keep playback rate parameter for loaded files?
 - midi input?

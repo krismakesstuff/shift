@@ -38,9 +38,9 @@ shiftLabel.id = "shift-label";
 shiftLabel.innerHTML = "shift";
 shiftParentDiv.appendChild(shiftLabel);
 // shift parameters
-createSlider(shiftParentDiv, "playbackrate", 0.001, 5, 0.01, sliderCallback);
-createSlider(shiftParentDiv, "shiftamount", 0, 50, 0.01, sliderCallback);
-createSlider(shiftParentDiv, "shiftwindow", 0, 100, 0.01, sliderCallback);
+createSlider(shiftParentDiv, "shiftwindow", 0, 1000, 0.001, sliderCallback);
+createSlider(shiftParentDiv, "shiftamount", 0, 10, 0.01, sliderCallback);
+createSlider(shiftParentDiv, "shiftfeedback", 0.001, 0.8, 0.001, sliderCallback);
 
 // lfo label
 let lfoLabel = document.createElement("div");
@@ -50,7 +50,7 @@ lfoLabel.innerHTML = "lfo panner";
 lfoParentDiv.appendChild(lfoLabel); 
 // lfo parameters
 createSlider(lfoParentDiv, "lfofreq", 0, 15, 0.01, sliderCallback); 
-createSlider(lfoParentDiv, "lfoamount", 0, 1.0, 0.01, sliderCallback);  
+createSlider(lfoParentDiv, "lfoamount", 0, 1.0, 0.001, sliderCallback);  
 
 // delay label
 let delayLabel = document.createElement("div");
@@ -60,8 +60,8 @@ delayLabel.innerHTML = "delay";
 delayParentDiv.appendChild(delayLabel);
 // delay parameters
 createSlider(delayParentDiv, "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
-createSlider(delayParentDiv, "delayms", 0, 1000, 0.1, sliderCallback);  
-createSlider(delayParentDiv, "delayfeedback", 0, 2.0, 0.01, sliderCallback);
+createSlider(delayParentDiv, "delayms", 0, 2000, 0.1, sliderCallback);  
+createSlider(delayParentDiv, "delayfeedback", 0, 1.0, 0.001, sliderCallback);
 
 
 
@@ -70,8 +70,8 @@ createSlider(delayParentDiv, "delayfeedback", 0, 2.0, 0.01, sliderCallback);
 let outputDiv = document.getElementById("output-section");
 // output sliders and print button
 createSlider(outputDiv, "wetdry", 0, 1.0, 0.01, sliderCallback);
-createSlider(outputDiv, "output", 0, 1, 0.01, sliderCallback);
-createPrintButton(outputDiv, "print", "wetbuffer");
+createSlider(outputDiv, "output", 0, 1.0, 0.01, sliderCallback);
+//createPrintButton(outputDiv, "print", "wetbuffer");
 
 
 // let overlayParent = document.getElementById("overlays");
@@ -140,8 +140,10 @@ function createSlider(parentDiv, name, min, max, step, callback) {
     input.value = slider.value;
     input.step = step;
     input.addEventListener("input", (event) => {
+        // update slider
         slider.value = input.value;
-        callback(event);
+        // update rnbo parameter
+        updateParamValue(name, input.value);
     });
 
     // Insert the slider and label into the parameters-section element
@@ -222,32 +224,33 @@ function presetSelected() {
      
     // get preset object from name
     let preset = presets.find(p => p.name === presetName);
-    console.log("preset object: " + preset.name);
-    //console.log("preset: " + preset.preset);
 
     // set preset parameter in device
     if(device){
-        // if we are playing we stop. 
-        if(device.parametersById.get("play").value == 1){
-            device.parametersById.get("play").value = 0;
-        }
 
         device.setPreset(preset.preset);
         console.log("preset parameter set to: " + preset.name);
+        
+        // update sliders
+        updateSliders();
     }
 
-    // update sliders
-    updateSliders();
 }
 
 
 // update slider display values from device parameters
 function updateSliders() {
-    sliders.forEach((slider) => {
-        const paramId = slider.id.replace('-slider', '');
+    sliders.forEach((element) => {
+
+        const paramId = element.id.replace('-slider', '');
+        if(paramId == "output" || paramId == "wetdry") {
+            return;
+        }
+
         const param = device.parametersById.get(paramId);
-        slider.value = param.value;
-        const input = document.getElementById(slider.id + "-display");
+        console.log(`updating slider ${paramId} to ${param.value}`);
+        element.value = param.value;
+        const input = document.getElementById(element.id + "-display");
         input.value = param.value;
     });
 }
@@ -288,11 +291,24 @@ function sliderCallback() {
     input.value = sliderValue;
 
     // set parameter in device
+
     if(device){
-        const param = device.parametersById.get(paramId);
-        param.value = sliderValue;
-        console.log(`${sliderId}: parameter ${paramId} set to: ${param.value}`);
+
+        if(paramId == "output"){
+            outputGainNode.gain.setValueAtTime(sliderValue, context.currentTime);
+            console.log(`output gain set to: ${outputGainNode.gain.value}`)
+        }else{
+
+            updateParamValue(paramId, sliderValue);
+        }
     }
+}
+
+// update ParamId with new value
+function updateParamValue(paramId, value) {
+    const param = device.parametersById.get(paramId);
+    param.value = value;
+    console.log(`${paramId} set to: ${param.value}`);
 }
 
 // callback for any toggle button, uses button id to determine which parameter to set
@@ -302,28 +318,53 @@ function buttonCallback() {
     console.log(`Button ${buttonId} clicked`);
     var paramId = buttonId.replace('-button','');
 
-    // get button state and toogle
+    // change button state for css
     this.dataset.state = this.dataset.state === "off" ? "on" : "off";
     let newState = this.dataset.state;
+
+    // get button state and toogle
+    
 
     if(paramId == "mic"){   
         toggleMicInput();
     } else if(paramId == "play"){
-        if(newState == "on"){
-            this.innerHTML = "stop";
-        } else {
-            this.innerHTML = "play";
-        }
+        togglePlayButton(newState);
     } else if(paramId == "loop") {
-        if(newState == "on"){
-            this.innerHTML = "looping";
-        } else {
-            this.innerHTML = "loop";
-        }
+        toggleLoopButton(newState);
     }
     
 }
 
+// toggle play button and update wavesurfer playback
+function togglePlayButton(newState) {
+    const playButton = document.getElementById("play-button");
+
+    // change button state text
+    if(newState == "on"){
+        // change play parameter in wavesurfer
+        wavesurfer.play();
+        playButton.innerHTML = "stop";
+    } else {
+        wavesurfer.stop();
+        playButton.innerHTML = "play";
+    }
+
+}
+
+// toffle loop button and update wavesurfer loop
+function toggleLoopButton(newState) {
+    const loopButton = document.getElementById("loop-button");
+    
+    // looping functionality is handled as a wavesurfer event that checks the loop button state after it's done playing
+    // change button state text
+    if(newState == "on"){
+        loopButton.innerHTML = "loopin";
+    } else {
+        loopButton.innerHTML = "loop";
+    }
+
+    
+}
 
 // -------  Helper Functions  ------- //
 

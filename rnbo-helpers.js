@@ -14,14 +14,15 @@ let defaultPreset = "default"; // set to the name of the preset you want to load
 // Create AudioContext
 const WAContext = window.AudioContext || window.webkitAudioContext;
 const context = new WAContext();
+let outputGainNode = context.createGain();
 
 async function createRNBODevice(patchExportURL, offline) {
     
+    
     // Create gain node and connect it to audio output
-    const outputNode = context.createGain();
+    //const outputNode = context.createGain();
     
-    
-    outputNode.connect(context.destination);
+    outputGainNode.connect(context.destination);
 
     // Fetch the exported patcher
     let response, patcher;
@@ -59,7 +60,7 @@ async function createRNBODevice(patchExportURL, offline) {
     }
 
     // Connect the device to the web audio graph
-    device.node.connect(outputNode);
+    device.node.connect(outputGainNode);
 
     document.body.onclick = () => {
         context.resume();
@@ -92,6 +93,7 @@ async function createRNBODevice(patchExportURL, offline) {
     // Create a preset select element in the output section
     let outputSection = document.getElementById("output-section");
     createPresetSelect(outputSection, presets, presetSelected);
+
 
     return [device, context];
 }
