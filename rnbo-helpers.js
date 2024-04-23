@@ -5,38 +5,41 @@
 // see: https://rnbo.cycling74.com/learn/loading-a-rnbo-device-in-the-browser-js
 // see: https://youtu.be/l42_f9Ir8fQ?si=_1eSUs2Ipbc8S9cu
 
-const patchExportURL = "rnbo-export/shift.export.json";
+
+import { createPresetSelect, presetSelected } from "./uiBuilders.js";
+import { addNewRecordingPlayer } from './uiBuilders.js';
+import { updateRecordingWaveform } from './uiBuilders.js';
+export const patchExportURL = "rnbo-export/shift.export.json";
 
 let response, patcher;
-var presets;
+export var presets;
 let defaultPreset = "default"; // set to the name of the preset you want to load by
 
+export let device;
 // Create AudioContext
 const WAContext = window.AudioContext || window.webkitAudioContext;
-const context = new WAContext();
-let outputGainNode = context.createGain();
+export const context = new WAContext();
+export let outputGainNode = context.createGain();
+export let mediaRecorder;
+export let recordedChunks = [];
 
-async function createRNBODevice(patchExportURL, offline) {
+export async function createRNBODevice(patchExportURL, offline) {
     
     
-    // Create gain node and connect it to audio output
-    //const outputNode = context.createGain();
     
-    outputGainNode.connect(context.destination);
-
     // Fetch the exported patcher
     let response, patcher;
     try {
         response = await fetch(patchExportURL);
         patcher = await response.json();
-    
+        
         if (!window.RNBO) {
             // Load RNBO script dynamically
             // Note that you can skip this by knowing the RNBO version of your patch
             // beforehand and just include it using a <script> tag
             await loadRNBOScript(patcher.desc.meta.rnboversion);
         }
-
+        
     } catch (err) {
         const errorContext = {
             error: err
@@ -50,17 +53,45 @@ async function createRNBODevice(patchExportURL, offline) {
         }
         throw err;
     }
-
+    
     // Create the device
-    let device;
     try {
         device = await RNBO.createDevice({ context, patcher });
     } catch (err) {
         throw err;
     }
-
+    
+    
     // Connect the device to the web audio graph
     device.node.connect(outputGainNode);
+
+    // connect gain node to recorder
+    let streamDestination = context.createMediaStreamDestination();
+    mediaRecorder = new MediaRecorder(streamDestination.stream);
+
+    mediaRecorder.onstart = function(e) {
+        console.log("recording started");
+        //recordedChunks = [];
+    }
+
+    mediaRecorder.ondataavailable = function(e) {
+        console.log("data available");
+        recordedChunks.push(e.data);
+        updateRecordingWaveform(e.data);
+    }
+
+    mediaRecorder.onstop = function(e) {
+        console.log("recording stopped");
+        let blob = new Blob(recordedChunks, { 'type' : 'audio/ogg; codecs=opus' });
+       
+        //showFinsihedRecording(blob);
+    }
+
+
+    outputGainNode.connect(streamDestination);
+    
+    // connect gain node to audio output
+    outputGainNode.connect(context.destination);
 
     document.body.onclick = () => {
         context.resume();
@@ -95,7 +126,8 @@ async function createRNBODevice(patchExportURL, offline) {
     createPresetSelect(outputSection, presets, presetSelected);
 
 
-    return [device, context];
+    //return [device, context];
+    
 }
 
 

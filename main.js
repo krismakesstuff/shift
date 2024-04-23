@@ -1,7 +1,7 @@
 console.log('main.js');
 
-//import {RegionsPlugin} from "https://unpkg.com/wavesurfer.js@7.7.11/dist/plugins/plugins/regions.d.ts";
-
+import { createRNBODevice, patchExportURL, device, context } from './rnbo-helpers.js';
+//import { WaveSurfer } from 'wavesurfer.js';
 let bufferDescs;
 
 const sampleRate = 44100;
@@ -9,11 +9,15 @@ const numChans = 2;
 
 var droppedFile;
 var getDroppedFile = false;
-//let rnboDevice;
+
+export let wavesurfer; 
+export const audioElement = document.getElementById("audio");
+
+
 
 // setup rnbo device
 async function setupRNBO() {
-    [device, audioContext] = await createRNBODevice(patchExportURL);
+    await createRNBODevice(patchExportURL);
     console.log("RNBO Device Created");
 
     if(!device) {
@@ -47,7 +51,7 @@ const disconnectMicStream = () => {
 }
 
 // get microphone input
-function toggleMicInput(){
+export function toggleMicInput(){
     // check if mic is already connected
     if(micSourceNode){
         // if mic is connected, disconnect it
@@ -172,21 +176,16 @@ function loadDroppedFile(){
 // timer to check if file has been dropped
 setInterval(loadDroppedFile, 1000); 
 
-//let wetSource;
-//let drySource;
 
-let wavesurfer; 
-const audioElement = document.getElementById("audio");
-
-//let wsRegions;
 
 function updateWaveform(file){
 
+    // update audio element src
     const url = URL.createObjectURL(file);
     audioElement.src = url;
     console.log("new audio src: " + url);
 
-    // update wavesurfer?
+    // update wavesurfer
     wavesurfer.load(url);
 }
 
@@ -195,30 +194,6 @@ function createWaveform(buffer, file){
     console.log("creating waveform");
     if(device){
 
-        // const audioElement = document.getElementById("audio");
-        // const url = URL.createObjectURL(file);
-        // audioElement.src = url;
-        // const newSource = device.context.createMediaElementSource(audioElement);
-        // console.log("new source: " + newSource);
-        
-        //drySource = newSource;
-
-        //drySource.connect(device.node);
-        //newSource.connect(device.node);
-        //device.node.connect(newSource);
-
-        // wavesurfer = WaveSurfer.create({
-        //     container: '#waveform',
-        //     waveColor: '#E5383b',
-        //     progressColor: '#383351',
-        //     height: 100,
-        //     media: audioElement,
-        // });
-       
-        // REGIONS NOT WORKING YET
-        // wsRegions = wavesurfer.registerPlugin(Wavesurfer.RegionsPlugin.create());
-        // wsRegions.enableDragSelection();
-
         const newSource = device.context.createMediaElementSource(audioElement);
         newSource.connect(device.node);
         
@@ -226,8 +201,9 @@ function createWaveform(buffer, file){
             container: '#waveform',
             waveColor: '#E5383b',
             progressColor: '#383351',
-            height: 100,
+            height: 50,
             media: audioElement,
+            splitChannels: true,
         });;
         
 
@@ -253,11 +229,7 @@ function createWaveform(buffer, file){
                 waveform.setAttribute("data-loading", "false");
                 waveform.innerHTML = "";
             }
-            // start
-            // wavesurfer.play();
-            // // update play-button state
-            // let playButton = document.getElementById("play-button");
-            // playButton.click();
+            
         });
 
         // hacky way to loop when done playing
@@ -273,6 +245,8 @@ function createWaveform(buffer, file){
                 playButton.click();
             }
         })
+
+        
 
     }
 };

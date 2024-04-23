@@ -9,8 +9,8 @@ pitch shifter -> lfo panner -> ping-pong delay.
 
 
 # todo: 
+- update recording wavesurfer as it's recording
 - when playing dropped file, make sure to account for mono and stereo. 
 - reset prest values now that min and maxes have changed
-- change print button to record and add wavesurfer instance when recording
 - custom slider colors
 - midi input?

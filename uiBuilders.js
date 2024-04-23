@@ -1,5 +1,14 @@
 console.log("uiBuilders.js loaded, loading UI...");
 
+import { wavesurfer } from "./main.js";
+import { device } from "./rnbo-helpers.js";
+import { context } from "./rnbo-helpers.js";
+import { presets } from "./rnbo-helpers.js";
+import { toggleMicInput } from "./main.js";
+import { audioElement } from "./main.js";
+import { mediaRecorder } from "./rnbo-helpers.js";
+import { recordedChunks } from "./rnbo-helpers.js";
+import { outputGainNode } from "./rnbo-helpers.js";
 
 // -------  UI Elements  ------- //
 
@@ -38,9 +47,9 @@ shiftLabel.id = "shift-label";
 shiftLabel.innerHTML = "shift";
 shiftParentDiv.appendChild(shiftLabel);
 // shift parameters
-createSlider(shiftParentDiv, "shiftwindow", 0, 1000, 0.001, sliderCallback);
-createSlider(shiftParentDiv, "shiftamount", 0, 10, 0.01, sliderCallback);
-createSlider(shiftParentDiv, "shiftfeedback", 0.001, 0.8, 0.001, sliderCallback);
+createSlider(shiftParentDiv, "window", "shiftwindow", 0, 1000, 0.001, sliderCallback);
+createSlider(shiftParentDiv, "amount", "shiftamount", 0, 10, 0.01, sliderCallback);
+createSlider(shiftParentDiv, "feedback", "shiftfeedback", 0.001, 0.8, 0.001, sliderCallback);
 
 // lfo label
 let lfoLabel = document.createElement("div");
@@ -49,8 +58,8 @@ lfoLabel.id = "lfo-label";
 lfoLabel.innerHTML = "lfo panner";
 lfoParentDiv.appendChild(lfoLabel); 
 // lfo parameters
-createSlider(lfoParentDiv, "lfofreq", 0, 15, 0.01, sliderCallback); 
-createSlider(lfoParentDiv, "lfoamount", 0, 1.0, 0.001, sliderCallback);  
+createSlider(lfoParentDiv, "frequency", "lfofreq", 0, 15, 0.01, sliderCallback); 
+createSlider(lfoParentDiv, "depth", "lfoamount", 0, 1.0, 0.001, sliderCallback);  
 
 // delay label
 let delayLabel = document.createElement("div");
@@ -59,24 +68,22 @@ delayLabel.id = "delay-label";
 delayLabel.innerHTML = "delay";
 delayParentDiv.appendChild(delayLabel);
 // delay parameters
-createSlider(delayParentDiv, "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
-createSlider(delayParentDiv, "delayms", 0, 2000, 0.1, sliderCallback);  
-createSlider(delayParentDiv, "delayfeedback", 0, 1.0, 0.001, sliderCallback);
-
-
+createSlider(delayParentDiv, "amount", "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
+createSlider(delayParentDiv, "time-ms", "delayms", 0, 2000, 0.1, sliderCallback);  
+createSlider(delayParentDiv, "feedback", "delayfeedback", 0, 1.0, 0.001, sliderCallback);
 
 
 // output section parameters
 let outputDiv = document.getElementById("output-section");
 // output sliders and print button
-createSlider(outputDiv, "wetdry", 0, 1.0, 0.01, sliderCallback);
-createSlider(outputDiv, "output", 0, 1.0, 0.01, sliderCallback);
-//createPrintButton(outputDiv, "print", "wetbuffer");
+createSlider(outputDiv, "mix", "wetdry", 0, 1.0, 0.01, sliderCallback);
+createSlider(outputDiv, "output", "output", 0, 1.0, 0.01, sliderCallback);
 
+// record section
+let recordDiv = document.getElementById("record-section");
+// record button
+createRecordButton(outputDiv, "record");
 
-// let overlayParent = document.getElementById("overlays");
-// createOverlay(overlayParent, "file-dragging");
-// createOverlay(overlayParent, "printing");
 
 // easy access to sliders   
 let sliders = document.querySelectorAll("input[type=range]");
@@ -86,7 +93,7 @@ let sliders = document.querySelectorAll("input[type=range]");
 
 
 // create a print button for the output buffer
-function createPrintButton(parentDiv, name, bufferId) {
+function createRecordButton(parentDiv, name) {
     // create outer div
     const outerDiv = document.createElement("div");
     outerDiv.className = "button-container";
@@ -96,7 +103,8 @@ function createPrintButton(parentDiv, name, bufferId) {
     const button = document.createElement("button");
     button.id = name + "-button";
     button.textContent = name;
-    //button.addEventListener("click", () => { printAudioToFile(bufferId); });
+    
+    button.addEventListener("click", () => { recordNewAudioFile(); });
 
     // Insert the button into the output element
     //const outputSection = document.getElementById("output-section");
@@ -106,11 +114,11 @@ function createPrintButton(parentDiv, name, bufferId) {
 
 
 // creates slider with given parameters and adds to section2
-function createSlider(parentDiv, name, min, max, step, callback) {
+function createSlider(parentDiv, displayName, paramID, min, max, step, callback) {
     // create outer div
     const outerDiv = document.createElement("div");
     outerDiv.className = "slider-container";
-    outerDiv.id = name;
+    outerDiv.id = paramID;
     
     // Create a input slider element
     const slider = document.createElement("input");
@@ -120,15 +128,15 @@ function createSlider(parentDiv, name, min, max, step, callback) {
     slider.max = max;
     slider.value = (max - min) / 2;
     slider.step = step;
-    slider.id = name + "-slider";
-    slider.name = name;
+    slider.id = paramID + "-slider";
+    slider.name = paramID;
     slider.addEventListener("input", callback);
 
     // Create a label for the slider
     const label = document.createElement("label");
     label.className = "slider-label";
-    label.textContent = name;
-    label.htmlFor = name;
+    label.textContent = displayName;
+    label.htmlFor = paramID;
 
     // create a number input element that updates the slider value
     const input = document.createElement("input");
@@ -177,7 +185,7 @@ function createToggleButton(parentDiv, name, callback) {
 }
 
 // create preset select for path presets. Called from createRMBODevice() in rnbo-helpers.js
-function createPresetSelect(parentDiv, presets, presetSelected) {
+export function createPresetSelect(parentDiv, presets, presetSelected) {
     
 
     // create outer div
@@ -213,9 +221,118 @@ function createPresetSelect(parentDiv, presets, presetSelected) {
 
 // -------  EVENT Callbacks  ------- //
 
+let recordWavesurfers = [];
+let record;
+let scrollingWaveform = false;
+
+
+// record button callback
+function recordNewAudioFile() {
+    console.log("record button clicked");
+    // if recording, stop recording
+    const recordButton = document.getElementById("record-button");
+    
+    if(recordButton.dataset.recording === "true"){
+        console.log("stop recording");
+        mediaRecorder.stop();
+        recordButton.innerHTML = "record";
+        recordButton.dataset.recording = "false";
+        clearInterval(timer);
+        // the onstop event will handle the final display of recording
+    } else {
+        console.log("start recording");
+        // change record button text
+        recordButton.innerHTML = "recording";
+        recordButton.dataset.recording = "true";
+
+        // make new wavesurfer instance
+        addNewRecordingPlayer();
+
+        // start recorder
+        mediaRecorder.start();
+    }
+
+    
+
+}
+
+let timer;
+let newSurfer;
+
+// add new recording player to record section
+export function addNewRecordingPlayer() {
+
+
+    // create parent div
+    const outerDiv = document.createElement("recording-container");
+    outerDiv.className = "recording-container";
+
+    // add play and download buttons
+    const playButton = document.createElement("button");
+    playButton.className = "recorded-play-button";
+    playButton.innerHTML = "play";
+    //playButton.addEventListener("click", () => { playRecording(); });
+    
+    const downloadButton = document.createElement("button");
+    downloadButton.className = "recorded-download-button";
+    downloadButton.innerHTML = "download";
+    //downloadButton.addEventListener("click", () => { downloadRecording(); });
+    
+    // add container to record section
+    let recordSection = document.getElementById("record-section");
+    recordSection.appendChild(outerDiv);
+
+    let blob = new Blob(recordedChunks, { 'type' : 'audio/wav' });
+
+    let url = URL.createObjectURL(blob);
+    let audio = document.createElement("audio");
+    audio.class = "recorded-audio";
+    audio.controls = true;
+    audio.src = url;
+    
+    // create new wavesurfer instance
+    newSurfer = WaveSurfer.create({
+        container: outerDiv,
+        waveColor: '#E5383b',
+        progressColor: '#383351',
+        height: 50,
+        media: audio,
+        splitChannels: true,
+    });
+
+    //recordWavesurfers.push(newSurfer);
+
+    // start timer to update wavesurfer
+    timer = setInterval(() => {
+        //let blob = new Blob(recordedChunks, { 'type' : 'audio/wav' });
+        if (mediaRecorder.state === "recording"){
+            let newBlob = mediaRecorder.requestData();
+           // console.log("new blob: "+ newBlob.type);
+            // let url = URL.createObjectURL(newBlob);
+            // newSurfer.load(url);
+        }
+    }, 5);
+
+
+    outerDiv.appendChild(playButton);
+    outerDiv.appendChild(downloadButton);
+    
+
+
+}
+
+
+export function updateRecordingWaveform(newBlob){
+    let url = URL.createObjectURL(newBlob);
+    if(newSurfer){
+        newSurfer.load(url);
+    }
+    
+}
+
 
 // preset select callback
-function presetSelected() {
+export function presetSelected() {
     console.log("preset selected");
     // get value from select
     let presetName = this.value;
@@ -291,7 +408,6 @@ function sliderCallback() {
     input.value = sliderValue;
 
     // set parameter in device
-
     if(device){
 
         if(paramId == "output"){
@@ -367,6 +483,9 @@ function toggleLoopButton(newState) {
 }
 
 // -------  Helper Functions  ------- //
+
+
+
 
 // print audio to file
 function printAudioToFile(bufferId) {

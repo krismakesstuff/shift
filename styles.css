@@ -116,16 +116,8 @@ label{
 body{
     display: grid;  
     background-color: var(--color-dark);
-    /* grid-template-areas: 
-    "header" "help-text" "help-text"
-    "file-section" "file-section" "file-section"
-    "shift-section" "delay-section" "lfo-section"
-    "ouput-section" "ouput-section" "ouput-section"; */
 
 }
-
-
-/* define section1 grid using grid-templates */
 
 #title-section{
     display: grid;
@@ -259,8 +251,6 @@ body{
 
 }
 
-
-
 #parameters-section {
     display: grid;
     grid-area: "parameters-section";
@@ -297,40 +287,15 @@ body{
     /* box-shadow: 5px 5px var(--border-radius-small) 5px var(--color-light-white); */
 }
 
-/* #shift-parent {
-    display: grid;
-    grid-area: "shift-section";
-    
-}
 
-#delay-parent {
-    display: grid;
-    grid-area: "delay-section";
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    grid-gap: 10px;
-    padding: 10px;
-    background-color: var(--color-light-grey);
-    border-radius: var(--border-radius-small);
-}
 
-#lfo-parent {
-    display: grid;
-    grid-area: "lfo-section";
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    grid-gap: 10px;
-    padding: 10px;
-    background-color: var(--color-light-grey);
-    border-radius: var(--border-radius-small);
-} */
 
 #output-section {
     display: grid;
     grid-area: "output-section";
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    grid-gap: 40px;
+    grid-gap: 40px, 10px;
     padding-left: var(--side-padding);
     padding-right: var(--side-padding);
     padding-top: var(--vertical-padding);
@@ -361,29 +326,97 @@ body{
     color: var(--color-light-grey);
 }
 
+.preset-select-container{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 1fr;
+    padding-right: 35px;
+}
+
+#preset-label{
+    grid-column: 1/ 2;
+    padding-top: var(--vertical-padding);
+}
+
 #preset-select{
     color: var(--color-dark);
     background-color: var(--color-light-grey);
+    grid-column: 2 / 3;
+    height: 45%;
+    align-content: first baseline;
 }
 
-#print-button-container {
-    display: grid;
-    grid-row: 2;
-    grid-column: 3;
-
-}
-
-#print-button {
-    width: 90%;
-    height: 90%;  
+#record-button{
+    grid-column: 2 / 3;
+    font-family: var(--text-font-family);
+    font-style: bold;
     font-size: var(--text-size-large);
-    font-weight: bold;
+    width: 65%;
+    height: 50px;   
     color: var(--color-dark);
     background-color: var(--color-light-red);
-    text-transform: var(--text-transform);
-    border: none;    
+    border: none;
     border-radius: var(--border-radius-small);
-    justify-self: end;
+    align-self: center;
+    justify-self: center;
 }
 
+#record-section{
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: var(--side-padding);
+}
 
+.recording-container{
+    display: grid;
+    grid-template-columns: 5fr 50px 50px; 
+    grid-template-rows: 1fr 1fr;
+    padding-top: var(--vertical-padding);
+    padding-bottom: var(--vertical-padding);
+    margin-bottom: var(--vertical-padding);
+    background-color: var(--color-light-grey);
+    border-radius: var(--border-radius-small);
+}
+
+.recorded-play-button{
+    display: grid;
+    grid-column: 2 / 4;
+    grid-row: 1 / 2;
+    font-family: var(--text-font-family);
+    font-style: bold;
+    font-size: var(--text-size-small);
+    width: 80%;
+    height: 80%;   
+    color: var(--color-dark);
+    background-color: var(--color-light-red);
+    border: none;
+    border-radius: var(--border-radius-small);
+    align-self: center;
+    justify-self: center;
+    align-content: center;
+    
+}
+
+.recorded-download-button{
+    display: grid;
+    grid-column: 2 / 4; 
+    grid-row: 2 / 3;
+    font-family: var(--text-font-family);
+    font-style: bold;
+    font-size: var(--text-size-small);
+    width: 80%;
+    height: 80%;   
+    color: var(--color-dark);
+    background-color: var(--color-light-red);
+    border: none;
+    border-radius: var(--border-radius-small);
+    align-self: center;
+    justify-self: center;
+    align-content: center;
+
+}
+
+.recording-container div:first-child{
+    grid-row: 1 / 3;
+
+}

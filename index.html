@@ -4,53 +4,38 @@
     <title>shift</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/wavesurfer.js@7"></script>
-    
-    <script type="importmap">
-        {
-          "imports": {
-            "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
-          }
-        }
-      </script>
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/record.min.js"></script>
 </head>
 <body>
 
     <input type="file" id="fileElem" multiple accept="audio/*" style="display:none" >   
     <audio id="audio" ></audio>
+
     <div id="title-section">
         <h1>shift</h1>
         <h2>audio re-sampler</h2>
-    </div>  
+    </div>
+
     <div id="file-section">
-        
-    
-        
         <div id="waveform">
             <!-- Your waveform content goes here -->
         </div>
-
-        
     </div>
-
-    
 
     <div id="parameters-section">
         <!-- parameters go here, added from uiBuilders.js-->
         
-
-        <!--<script type="module"src="visualizer.js"></script>-->
-        
     </div>
     
     <div id="output-section">
-        
     </div>
 
+    <div id="record-section">
+    </div>
     
-    <script src="uiBuilders.js"></script>
-    <script src="rnbo-helpers.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="uiBuilders.js"></script>
+    <script type="module" src="rnbo-helpers.js"></script>
+    <script type="module" src="main.js"></script>
 
     </body>
 </html>
