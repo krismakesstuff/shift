@@ -13,11 +13,24 @@ import { outputGainNode } from "./rnbo-helpers.js";
 // -------  UI Elements  ------- //
 
 // create and add Toggle Buttons for play and loop 
-let fileSection = document.getElementById("file-section");
+let inputSection = document.getElementById("input-section");
 
-createToggleButton(fileSection, "loop", buttonCallback);
-createToggleButton(fileSection, "play", buttonCallback);
-createToggleButton(fileSection, "mic", buttonCallback);
+createToggleButton(inputSection, "mic", buttonCallback);
+
+// output section parameters
+let outputDiv = document.getElementById("output-section");
+// output sliders and print button
+createSlider(outputDiv, "mix", "wetdry", 0, 1.0, 0.01, sliderCallback);
+createSlider(outputDiv, "output", "output", 0, 1.0, 0.01, sliderCallback);
+
+let playBackDiv = document.createElement("div");
+playBackDiv.id = "playback-container";
+outputDiv.appendChild(playBackDiv);
+// buttons
+createToggleButton(playBackDiv, "play", buttonCallback);
+createToggleButton(playBackDiv, "loop", buttonCallback);
+createRecordButton(playBackDiv, "record");
+
 
 // create Parent Divs for parameters
 const shiftParentDiv = document.createElement("div");  
@@ -73,16 +86,10 @@ createSlider(delayParentDiv, "time-ms", "delayms", 0, 2000, 0.1, sliderCallback)
 createSlider(delayParentDiv, "feedback", "delayfeedback", 0, 1.0, 0.001, sliderCallback);
 
 
-// output section parameters
-let outputDiv = document.getElementById("output-section");
-// output sliders and print button
-createSlider(outputDiv, "mix", "wetdry", 0, 1.0, 0.01, sliderCallback);
-createSlider(outputDiv, "output", "output", 0, 1.0, 0.01, sliderCallback);
 
 // record section
 let recordDiv = document.getElementById("record-section");
-// record button
-createRecordButton(outputDiv, "record");
+
 
 
 // easy access to sliders   
@@ -181,20 +188,20 @@ function createToggleButton(parentDiv, name, callback) {
     //const fileSection = document.getElementById("file-section");
     outerDiv.appendChild(button);
     //fileSection.appendChild(outerDiv);
-    parentDiv.insertBefore(outerDiv, fileSection.firstChild);
+    //parentDiv.insertBefore(outerDiv, fileSection.firstChild);
+    parentDiv.appendChild(outerDiv);
 }
 
 // create preset select for path presets. Called from createRMBODevice() in rnbo-helpers.js
 export function createPresetSelect(parentDiv, presets, presetSelected) {
     
-
     // create outer div
     const outerDiv = document.createElement("div");
     outerDiv.className = "preset-select-container"; 
 
     // create a label for the select
     const label = document.createElement("label");
-    label.textContent = "Presets";
+    label.textContent = "presets";
     label.id = "preset-label";
     label.htmlFor = "preset-select";
     outerDiv.appendChild(label);
@@ -235,58 +242,84 @@ function recordNewAudioFile() {
     if(recordButton.dataset.recording === "true"){
         console.log("stop recording");
         mediaRecorder.stop();
+        let playButton = document.getElementById("play-button");
+        if(playButton.dataset.state === "on"){
+            playButton.click();
+        }
         recordButton.innerHTML = "record";
         recordButton.dataset.recording = "false";
-        clearInterval(timer);
         // the onstop event will handle the final display of recording
+        
     } else {
         console.log("start recording");
         // change record button text
         recordButton.innerHTML = "recording";
         recordButton.dataset.recording = "true";
 
-        // make new wavesurfer instance
-        addNewRecordingPlayer();
-
         // start recorder
         mediaRecorder.start();
     }
-
-    
 
 }
 
 let timer;
 let newSurfer;
+let recordings = [];
 
 // add new recording player to record section
-export function addNewRecordingPlayer() {
+export function addNewRecordingPlayer(blob) {
 
+    // generate unique id for recording
+    let newId = "-" + Date.now();
 
     // create parent div
-    const outerDiv = document.createElement("recording-container");
+    const outerDiv = document.createElement("div");
     outerDiv.className = "recording-container";
-
+    outerDiv.id = "recording-container" + newId;
     // add play and download buttons
     const playButton = document.createElement("button");
     playButton.className = "recorded-play-button";
+    playButton.id = "recorded-play-button" + newId;
     playButton.innerHTML = "play";
-    //playButton.addEventListener("click", () => { playRecording(); });
+    playButton.addEventListener("click", () => {
+        let id = playButton.id.replace("recorded-play-button", "");
+        // if playing, stop
+        if(playButton.dataset.state === "on"){
+            playButton.dataset.state = "off";
+            playButton.innerHTML = "play";
+            recordings.find(r => r.id === id).surfer.stop();
+        } else {
+            playButton.dataset.state = "on";    
+            playButton.innerHTML = "stop";
+            // stop other recordings
+            recordings.forEach(r => r.surfer.stop());
+            recordings.find(r => r.id === id).surfer.play();
+
+        }
+     });
     
     const downloadButton = document.createElement("button");
     downloadButton.className = "recorded-download-button";
+    downloadButton.id = "recorded-download-button" + newId; 
     downloadButton.innerHTML = "download";
-    //downloadButton.addEventListener("click", () => { downloadRecording(); });
+    downloadButton.addEventListener("click", () => { 
+        let downloadLink = document.createElement("a");
+        downloadLink.id = "download-link" + newId;
+        downloadLink.href = url;
+        downloadLink.download = "recording" + newId + ".wav";   
+        outerDiv.appendChild(downloadLink);
+        downloadLink.click();
+     });
     
     // add container to record section
     let recordSection = document.getElementById("record-section");
     recordSection.appendChild(outerDiv);
 
-    let blob = new Blob(recordedChunks, { 'type' : 'audio/wav' });
-
+    // create audio element
     let url = URL.createObjectURL(blob);
     let audio = document.createElement("audio");
     audio.class = "recorded-audio";
+    audio.id = "recorded-audio" + newId;
     audio.controls = true;
     audio.src = url;
     
@@ -300,18 +333,14 @@ export function addNewRecordingPlayer() {
         splitChannels: true,
     });
 
-    //recordWavesurfers.push(newSurfer);
+    
+    wavesurfer.on('finish', function (){
+        playButton.click();
+    });
 
-    // start timer to update wavesurfer
-    timer = setInterval(() => {
-        //let blob = new Blob(recordedChunks, { 'type' : 'audio/wav' });
-        if (mediaRecorder.state === "recording"){
-            let newBlob = mediaRecorder.requestData();
-           // console.log("new blob: "+ newBlob.type);
-            // let url = URL.createObjectURL(newBlob);
-            // newSurfer.load(url);
-        }
-    }, 5);
+    let obj = {id: newId, surfer: newSurfer, container: outerDiv};
+    recordings.push(obj);
+    console.log("recording added: " + obj.id + " " + obj.surfer);
 
 
     outerDiv.appendChild(playButton);

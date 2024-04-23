@@ -83,7 +83,7 @@ export async function createRNBODevice(patchExportURL, offline) {
     mediaRecorder.onstop = function(e) {
         console.log("recording stopped");
         let blob = new Blob(recordedChunks, { 'type' : 'audio/ogg; codecs=opus' });
-       
+        addNewRecordingPlayer(blob);    
         //showFinsihedRecording(blob);
     }
 
