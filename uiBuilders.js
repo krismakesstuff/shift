@@ -266,98 +266,100 @@ let timer;
 let newSurfer;
 let recordings = [];
 
-// add new recording player to record section
-export function addNewRecordingPlayer(blob) {
 
-    // generate unique id for recording
-    let newId = "-" + Date.now();
-
-    // create parent div
-    const outerDiv = document.createElement("div");
-    outerDiv.className = "recording-container";
-    outerDiv.id = "recording-container" + newId;
-    // add play and download buttons
-    const playButton = document.createElement("button");
-    playButton.className = "recorded-play-button";
-    playButton.id = "recorded-play-button" + newId;
-    playButton.innerHTML = "play";
-    playButton.addEventListener("click", () => {
-        let id = playButton.id.replace("recorded-play-button", "");
-        // if playing, stop
-        if(playButton.dataset.state === "on"){
-            playButton.dataset.state = "off";
-            playButton.innerHTML = "play";
-            recordings.find(r => r.id === id).surfer.stop();
-        } else {
-            playButton.dataset.state = "on";    
-            playButton.innerHTML = "stop";
-            // stop other recordings
-            recordings.forEach(r => r.surfer.stop());
-            recordings.find(r => r.id === id).surfer.play();
-
-        }
-     });
-    
-    const downloadButton = document.createElement("button");
-    downloadButton.className = "recorded-download-button";
-    downloadButton.id = "recorded-download-button" + newId; 
-    downloadButton.innerHTML = "download";
-    downloadButton.addEventListener("click", () => { 
-        let downloadLink = document.createElement("a");
-        downloadLink.id = "download-link" + newId;
-        downloadLink.href = url;
-        downloadLink.download = "recording" + newId + ".wav";   
-        outerDiv.appendChild(downloadLink);
-        downloadLink.click();
-     });
-    
-    // add container to record section
-    let recordSection = document.getElementById("record-section");
-    recordSection.appendChild(outerDiv);
-
-    // create audio element
+export function downloadNewRecording(blob) {
+    let downloadLink = document.getElementById("download-link");    
     let url = URL.createObjectURL(blob);
-    let audio = document.createElement("audio");
-    audio.class = "recorded-audio";
-    audio.id = "recorded-audio" + newId;
-    audio.controls = true;
-    audio.src = url;
+    downloadLink.href = url;
+    downloadLink.download = "recording" + Date.now() +".wav";
+    downloadLink.click();
+}   
+
+
+
+// add new recording player to record section
+// export function addNewRecordingPlayer(blob) {
+
+//     // generate unique id for recording
+//     let newId = "-" + Date.now();
+
+//     // create parent div
+//     const outerDiv = document.createElement("div");
+//     outerDiv.className = "recording-container";
+//     outerDiv.id = "recording-container" + newId;
+//     // add play and download buttons
+//     const playButton = document.createElement("button");
+//     playButton.className = "recorded-play-button";
+//     playButton.id = "recorded-play-button" + newId;
+//     playButton.innerHTML = "play";
+//     playButton.addEventListener("click", () => {
+//         let id = playButton.id.replace("recorded-play-button", "");
+//         // if playing, stop
+//         if(playButton.dataset.state === "on"){
+//             playButton.dataset.state = "off";
+//             playButton.innerHTML = "play";
+//             recordings.find(r => r.id === id).surfer.stop();
+//         } else {
+//             playButton.dataset.state = "on";    
+//             playButton.innerHTML = "stop";
+//             // stop other recordings
+//             recordings.forEach(r => r.surfer.stop());
+//             recordings.find(r => r.id === id).surfer.play();
+
+//         }
+//      });
     
-    // create new wavesurfer instance
-    newSurfer = WaveSurfer.create({
-        container: outerDiv,
-        waveColor: '#E5383b',
-        progressColor: '#383351',
-        height: 50,
-        media: audio,
-        splitChannels: true,
-    });
+//     const downloadButton = document.createElement("button");
+//     downloadButton.className = "recorded-download-button";
+//     downloadButton.id = "recorded-download-button" + newId; 
+//     downloadButton.innerHTML = "download";
+//     downloadButton.addEventListener("click", () => { 
+//         let downloadLink = document.createElement("a");
+//         downloadLink.id = "download-link" + newId;
+//         downloadLink.href = url;
+//         downloadLink.download = "recording" + newId + ".wav";   
+//         outerDiv.appendChild(downloadLink);
+//         downloadLink.click();
+//      });
+    
+//     // add container to record section
+//     let recordSection = document.getElementById("record-section");
+//     recordSection.appendChild(outerDiv);
+
+//     // create audio element
+//     let url = URL.createObjectURL(blob);
+//     let audio = document.createElement("audio");
+//     audio.class = "recorded-audio";
+//     audio.id = "recorded-audio" + newId;
+//     audio.controls = true;
+//     audio.src = url;
+    
+//     // create new wavesurfer instance
+//     newSurfer = WaveSurfer.create({
+//         container: outerDiv,
+//         waveColor: '#E5383b',
+//         progressColor: '#383351',
+//         height: 50,
+//         media: audio,
+//         splitChannels: true,
+//     });
 
     
-    wavesurfer.on('finish', function (){
-        playButton.click();
-    });
+//     wavesurfer.on('finish', function (){
+//         playButton.click();
+//     });
 
-    let obj = {id: newId, surfer: newSurfer, container: outerDiv};
-    recordings.push(obj);
-    console.log("recording added: " + obj.id + " " + obj.surfer);
+//     let obj = {id: newId, surfer: newSurfer, container: outerDiv};
+//     recordings.push(obj);
+//     console.log("recording added: " + obj.id + " " + obj.surfer);
 
 
-    outerDiv.appendChild(playButton);
-    outerDiv.appendChild(downloadButton);
+//     outerDiv.appendChild(playButton);
+//     outerDiv.appendChild(downloadButton);
     
 
 
-}
-
-
-export function updateRecordingWaveform(newBlob){
-    let url = URL.createObjectURL(newBlob);
-    if(newSurfer){
-        newSurfer.load(url);
-    }
-    
-}
+// }
 
 
 // preset select callback

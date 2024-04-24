@@ -4,12 +4,13 @@
     <title>shift</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/wavesurfer.js@7"></script>
-    <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/record.min.js"></script>
+    
 </head>
 <body>
 
     <input type="file" id="fileElem" multiple accept="audio/*" style="display:none" >   
     <audio id="audio" ></audio>
+    <a id="download-link" style="display:none"></a>
 
     <div id="title-section">
         <h1>shift</h1>
@@ -34,6 +35,8 @@
     <div id="record-section">
         <div id="record-section-title"> recordings </div>
     </div>
+
+
     
     <script type="module" src="uiBuilders.js"></script>
     <script type="module" src="rnbo-helpers.js"></script>

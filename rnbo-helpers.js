@@ -7,8 +7,8 @@
 
 
 import { createPresetSelect, presetSelected } from "./uiBuilders.js";
-import { addNewRecordingPlayer } from './uiBuilders.js';
-import { updateRecordingWaveform } from './uiBuilders.js';
+import { downloadNewRecording } from './uiBuilders.js';
+//import { updateRecordingWaveform } from './uiBuilders.js';
 export const patchExportURL = "rnbo-export/shift.export.json";
 
 let response, patcher;
@@ -71,19 +71,20 @@ export async function createRNBODevice(patchExportURL, offline) {
 
     mediaRecorder.onstart = function(e) {
         console.log("recording started");
-        //recordedChunks = [];
+        recordedChunks = [];
     }
 
     mediaRecorder.ondataavailable = function(e) {
         console.log("data available");
         recordedChunks.push(e.data);
-        updateRecordingWaveform(e.data);
+        //updateRecordingWaveform(e.data);
     }
 
     mediaRecorder.onstop = function(e) {
         console.log("recording stopped");
         let blob = new Blob(recordedChunks, { 'type' : 'audio/ogg; codecs=opus' });
-        addNewRecordingPlayer(blob);    
+        //addNewRecordingPlayer(blob);    
+        downloadNewRecording(blob);
         //showFinsihedRecording(blob);
     }
 
