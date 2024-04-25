@@ -44,29 +44,17 @@
 
 * {
     font-family: var(--text-font-family);
-    /* background-color: var(--color-dark); */
 }
 
-/* h1 {
-    font-size: 48px;
-    font-weight: bold;
-    font-style: italic;
-    color: var(--color-light-red);
-    background-color: var(--color-secondary);
-    text-transform: var(--text-transform);
-    text-align: left;
-    padding-left: var(--side-padding);
+button:hover {
+    background-color: var(--color-dark-grey) !important;
 }
 
-h2 {
-    font-size: 18px;
-    color: var(--color-light-grey);
-    background-color: var(--color-secondary);
-    text-transform: var(--text-transform);
+p {
+    font-size: 14px;
+    color: var(--color-dark-grey);
     text-align: left;
-    padding-left: var(--side-padding);
-
-} */
+}
 
 input[type="number"]{
     font-family: var(--text-font-family);
@@ -121,8 +109,8 @@ body{
 
 #title-section{
     display: grid;
-    grid-template-columns: 1fr 3fr 2fr;
-    grid-template-rows: 65px ;
+    grid-template-columns: 155px 3fr 2fr;
+    grid-template-rows: 1fr ;
     background-color: var(--color-dark);
 
 }
@@ -131,6 +119,7 @@ body{
     display: grid;
     grid-column: 1 / 2;
     grid-row: 1 / 2;
+    padding-left: var(--side-padding);  
 }
 
 #title-text{
@@ -141,17 +130,22 @@ body{
     background-color: var(--color-secondary);
     text-transform: var(--text-transform);
     text-align: left;
-    padding-left: var(--side-padding);  
+    
 }
 
 #help-text-container{
+    display: grid;
     grid-column: 2 / 3;
     grid-row: 1 / 2;
+    padding-left: 10px; 
+    justify-items: left;
+    align-items: center;    
 }
 
 #help-text{
-    font-size: 14.5px;
-    color: var(--color-light-grey);
+    font-family: var(--text-font-family);
+    font-size: 13px;
+    color: var(--color-dark-grey);
     text-align: left;
     padding-left: 10px;
 }
@@ -173,8 +167,9 @@ body{
 
     font-size: var(--text-size-small);
     font-weight: bold;
-    color: var(--color-light-white);
+    color: var(--color-light-grey);
     justify-self: center;
+    align-self: center;
 }
 
 #input-section {
@@ -216,10 +211,12 @@ body{
 
 #mic-button[data-state="on"]{
     background-color: var(--color-light-red);
+    animation: blinker 1.5s linear infinite;
 }
 
 #mic-button[data-state="off"]{
     background-color: var(--color-light-grey);
+    opacity: 1;
 }
 
 #play-button{
@@ -274,6 +271,7 @@ body{
 }
 
 #waveform-file-text-label{
+    font-family: var(--text-font-family);
     grid-column: 1 / 2; 
     font-style: bold;
     font-size: var(--text-size-large); 
@@ -282,9 +280,10 @@ body{
 }
 
 #waveform-file-text{
+    font-family: var(--text-font-family);
     grid-column: 2 / 3;
     font-size: var(--text-size-normal);
-    color: var(--color-light-grey);
+    color: var(--color-dark-grey);
     background-color: var(--color-dark);
     justify-self: first;
     padding-top: 6px;
@@ -344,7 +343,7 @@ body{
     grid-gap: 50px;
     padding-left: var(--side-padding);
     padding-right: var(--side-padding);
-    padding-top: 20px;
+
     padding-bottom: var(--vertical-padding);
     background-color: var(--color-dark);
     
@@ -374,13 +373,14 @@ body{
 #output-section {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 2fr;
     grid-gap: 10px 40px;
     padding-left: var(--side-padding);
     padding-right: var(--side-padding);
     padding-top: var(--vertical-padding);
     padding-bottom: var(--vertical-padding);
     background-color: var(--color-dark);
+
 }
 
 #playback-container{
@@ -414,11 +414,18 @@ body{
 
 #record-button[data-recording="true"]{
     background-color: var(--color-light-red);
-
+    animation: blinker 1.5s linear infinite;
 }   
+
+@keyframes blinker {
+    50% {
+        opacity: 0.5;
+    }
+}
 
 #record-button[data-recording="false"]{
     background-color: var(--color-light-grey);
+    opacity: 1;
 }
 
 .recording-container{
@@ -461,24 +468,28 @@ body{
 
 .preset-select-container{
     display: grid;
-    grid-template-columns: 1fr 2fr;
-    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    grid-template-rows: 25px 50px;
     grid-row: 2/3;
     grid-column: 1 /2;
     padding-right: 35px;
 }
 
 #preset-label{
-    grid-column: 1/ 2;
-    padding-top: var(--vertical-padding);
+    grid-row: 1/ 2;
+    padding-top: 5px;
 }
 
 #preset-select{
+    grid-row: 2 / 3;
     color: var(--color-dark);
     background-color: var(--color-light-grey);
-    grid-column: 2 / 3;
-    height: 45%;
-    align-content: first baseline;
+    height: 60%;
+    width: 85%;
+    align-self: center;
+    justify-self: first;   
+    /* padding-top: 10px; */
+    
 }
 
 

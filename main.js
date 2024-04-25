@@ -1,7 +1,8 @@
 console.log('main.js');
 
 import { createRNBODevice, patchExportURL, device, context } from './rnbo-helpers.js';
-//import { WaveSurfer } from 'wavesurfer.js';
+import { updateSliders } from './uiBuilders.js';
+
 let bufferDescs;
 
 const sampleRate = 44100;
@@ -26,6 +27,8 @@ async function setupRNBO() {
 
     createWaveform();
 
+    // update sliders from rnbo device
+    updateSliders();
 }
 
 
@@ -33,6 +36,9 @@ async function setupRNBO() {
 // We can't await here because it's top level, so we have to check later
 // if device and context have been assigned
 setupRNBO();
+
+
+
 
 // min input functions 
 let micSourceNode;

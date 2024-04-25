@@ -58,7 +58,7 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 574.5, 612.0, 157.0, 27.0 ]
+					"patching_rect" : [ 574.5, 613.0, 157.0, 27.0 ]
 				}
 
 			}
@@ -3034,7 +3034,7 @@
 										"preset" : 1
 									}
 ,
-									"rnbo_serial" : 10,
+									"rnbo_serial" : 2,
 									"rnbo_uniqueid" : "shiftfeedback",
 									"rnboinfo" : 									{
 										"needsInstanceInfo" : 1,
@@ -9931,12 +9931,12 @@
 						"embed" : 1,
 						"snapshot" : 						{
 							"shiftwindow" : 							{
-								"value" : 448.0
+								"value" : 0.0
 							}
 ,
 							"__presetid" : "d",
 							"shiftamount" : 							{
-								"value" : 4.488188976377953
+								"value" : 0.0
 							}
 ,
 							"delayms" : 							{
@@ -9948,7 +9948,7 @@
 							}
 ,
 							"shiftfeedback" : 							{
-								"value" : 0.2
+								"value" : 0.0
 							}
 ,
 							"delayfeedback" : 							{
@@ -9960,17 +9960,17 @@
 							}
 ,
 							"lfoamount" : 							{
-								"value" : 0.574803149606299
+								"value" : 0.01
 							}
 ,
 							"lfofreq" : 							{
-								"value" : 6.147637795275591
+								"value" : 0.01
 							}
 
 						}
 ,
 						"snapshotlist" : 						{
-							"current_snapshot" : 8,
+							"current_snapshot" : 0,
 							"entries" : [ 								{
 									"filetype" : "C74Snapshot",
 									"version" : 2,
@@ -9981,27 +9981,16 @@
 									"subtype" : "",
 									"embed" : 0,
 									"snapshot" : 									{
-										"lfofreq" : 										{
-											"value" : 0.836220472440945
-										}
-,
-										"delayms" : 										{
-											"value" : 0.0
-										}
-,
 										"shiftwindow" : 										{
 											"value" : 0.0
 										}
 ,
-										"lfoamount" : 										{
-											"value" : 0.716535433070866
-										}
-,
+										"__presetid" : "d",
 										"shiftamount" : 										{
 											"value" : 0.0
 										}
 ,
-										"delayfeedback" : 										{
+										"delayms" : 										{
 											"value" : 0.0
 										}
 ,
@@ -10009,33 +9998,34 @@
 											"value" : 0.0
 										}
 ,
-										"__presetid" : "d"
+										"shiftfeedback" : 										{
+											"value" : 0.0
+										}
+,
+										"delayfeedback" : 										{
+											"value" : 0.0
+										}
+,
+										"wetdry" : 										{
+											"value" : 0.0
+										}
+,
+										"lfoamount" : 										{
+											"value" : 0.01
+										}
+,
+										"lfofreq" : 										{
+											"value" : 0.01
+										}
+
 									}
 ,
 									"fileref" : 									{
 										"name" : "default",
-										"filename" : "d.maxsnap",
+										"filename" : "chorus-pingpong[1].maxsnap",
 										"filepath" : "~/Documents/Max 8/Snapshots",
 										"filepos" : -1,
-										"snapshotfileid" : "6a922e1cbcf8fe70e0e5c158dfcb1dec"
-									}
-
-								}
-, 								{
-									"filetype" : "C74Snapshot",
-									"version" : 2,
-									"minorversion" : 0,
-									"name" : "default",
-									"origin" : "d",
-									"type" : "rnbo",
-									"subtype" : "",
-									"embed" : 0,
-									"fileref" : 									{
-										"name" : "default",
-										"filename" : "d.maxsnap",
-										"filepath" : "~/Documents/Max 8/Snapshots",
-										"filepos" : -1,
-										"snapshotfileid" : "f0d08b4f7a43cc3075161da8b3a6e5d2"
+										"snapshotfileid" : "52fcbdf6955a8df06c3adeb985e9ea05"
 									}
 
 								}
@@ -10048,6 +10038,46 @@
 									"type" : "rnbo",
 									"subtype" : "",
 									"embed" : 0,
+									"snapshot" : 									{
+										"shiftwindow" : 										{
+											"value" : 0.0
+										}
+,
+										"__presetid" : "d",
+										"shiftamount" : 										{
+											"value" : 0.0
+										}
+,
+										"delayms" : 										{
+											"value" : 173.0
+										}
+,
+										"shiftdelaysend" : 										{
+											"value" : 0.748031496062992
+										}
+,
+										"shiftfeedback" : 										{
+											"value" : 0.0
+										}
+,
+										"delayfeedback" : 										{
+											"value" : 0.677165354330709
+										}
+,
+										"wetdry" : 										{
+											"value" : 0.354330708661417
+										}
+,
+										"lfoamount" : 										{
+											"value" : 0.01
+										}
+,
+										"lfofreq" : 										{
+											"value" : 0.01
+										}
+
+									}
+,
 									"fileref" : 									{
 										"name" : "ping pong delay",
 										"filename" : "d lfo panner[1].maxsnap",
@@ -10066,6 +10096,46 @@
 									"type" : "rnbo",
 									"subtype" : "",
 									"embed" : 0,
+									"snapshot" : 									{
+										"shiftwindow" : 										{
+											"value" : 0.0
+										}
+,
+										"__presetid" : "d",
+										"shiftamount" : 										{
+											"value" : 0.0
+										}
+,
+										"delayms" : 										{
+											"value" : 0.0
+										}
+,
+										"shiftdelaysend" : 										{
+											"value" : 0.0
+										}
+,
+										"shiftfeedback" : 										{
+											"value" : 0.0
+										}
+,
+										"delayfeedback" : 										{
+											"value" : 0.0
+										}
+,
+										"wetdry" : 										{
+											"value" : 0.338582677165354
+										}
+,
+										"lfoamount" : 										{
+											"value" : 0.811023622047244
+										}
+,
+										"lfofreq" : 										{
+											"value" : 2.134566929133858
+										}
+
+									}
+,
 									"fileref" : 									{
 										"name" : "slow lfo panner",
 										"filename" : "d[1].maxsnap",
@@ -10079,11 +10149,109 @@
 									"filetype" : "C74Snapshot",
 									"version" : 2,
 									"minorversion" : 0,
+									"name" : "fast lfo panner",
+									"origin" : "d",
+									"type" : "rnbo",
+									"subtype" : "",
+									"embed" : 0,
+									"snapshot" : 									{
+										"shiftwindow" : 										{
+											"value" : 0.0
+										}
+,
+										"__presetid" : "d",
+										"shiftamount" : 										{
+											"value" : 0.0
+										}
+,
+										"delayms" : 										{
+											"value" : 0.0
+										}
+,
+										"shiftdelaysend" : 										{
+											"value" : 0.0
+										}
+,
+										"shiftfeedback" : 										{
+											"value" : 0.0
+										}
+,
+										"delayfeedback" : 										{
+											"value" : 0.0
+										}
+,
+										"wetdry" : 										{
+											"value" : 0.440944881889764
+										}
+,
+										"lfoamount" : 										{
+											"value" : 0.582677165354331
+										}
+,
+										"lfofreq" : 										{
+											"value" : 12.049212598425196
+										}
+
+									}
+,
+									"fileref" : 									{
+										"name" : "fast lfo panner",
+										"filename" : "slow lfo panner[1].maxsnap",
+										"filepath" : "~/Documents/Max 8/Snapshots",
+										"filepos" : -1,
+										"snapshotfileid" : "89057db43f8c525a00c3680d03ad36f9"
+									}
+
+								}
+, 								{
+									"filetype" : "C74Snapshot",
+									"version" : 2,
+									"minorversion" : 0,
 									"name" : "shifter ",
 									"origin" : "d",
 									"type" : "rnbo",
 									"subtype" : "",
 									"embed" : 0,
+									"snapshot" : 									{
+										"shiftwindow" : 										{
+											"value" : 165.0
+										}
+,
+										"__presetid" : "d",
+										"shiftamount" : 										{
+											"value" : 1.496062992125984
+										}
+,
+										"delayms" : 										{
+											"value" : 0.0
+										}
+,
+										"shiftdelaysend" : 										{
+											"value" : 0.0
+										}
+,
+										"shiftfeedback" : 										{
+											"value" : 0.393700787401575
+										}
+,
+										"delayfeedback" : 										{
+											"value" : 0.0
+										}
+,
+										"wetdry" : 										{
+											"value" : 0.582677165354331
+										}
+,
+										"lfoamount" : 										{
+											"value" : 0.01
+										}
+,
+										"lfofreq" : 										{
+											"value" : 0.01
+										}
+
+									}
+,
 									"fileref" : 									{
 										"name" : "shifter ",
 										"filename" : "lfo panner[1].maxsnap",
@@ -10102,48 +10270,52 @@
 									"type" : "rnbo",
 									"subtype" : "",
 									"embed" : 0,
+									"snapshot" : 									{
+										"shiftwindow" : 										{
+											"value" : 165.0
+										}
+,
+										"__presetid" : "d",
+										"shiftamount" : 										{
+											"value" : 1.496062992125984
+										}
+,
+										"delayms" : 										{
+											"value" : 740.0
+										}
+,
+										"shiftdelaysend" : 										{
+											"value" : 0.464566929133858
+										}
+,
+										"shiftfeedback" : 										{
+											"value" : 0.393700787401575
+										}
+,
+										"delayfeedback" : 										{
+											"value" : 0.574803149606299
+										}
+,
+										"wetdry" : 										{
+											"value" : 0.582677165354331
+										}
+,
+										"lfoamount" : 										{
+											"value" : 0.01
+										}
+,
+										"lfofreq" : 										{
+											"value" : 0.01
+										}
+
+									}
+,
 									"fileref" : 									{
 										"name" : "shifter-delay",
 										"filename" : "shifter [1].maxsnap",
 										"filepath" : "~/Documents/Max 8/Snapshots",
 										"filepos" : -1,
 										"snapshotfileid" : "a3230173e3169027d45828eb300a8ef0"
-									}
-
-								}
-, 								{
-									"filetype" : "C74Snapshot",
-									"version" : 2,
-									"minorversion" : 0,
-									"name" : "deep-rattler",
-									"origin" : "d",
-									"type" : "rnbo",
-									"subtype" : "",
-									"embed" : 0,
-									"fileref" : 									{
-										"name" : "deep-rattler",
-										"filename" : "default[1].maxsnap",
-										"filepath" : "~/Documents/Max 8/Snapshots",
-										"filepos" : -1,
-										"snapshotfileid" : "7435bae30354258835ec99a90ca47f64"
-									}
-
-								}
-, 								{
-									"filetype" : "C74Snapshot",
-									"version" : 2,
-									"minorversion" : 0,
-									"name" : "fast lfo panner",
-									"origin" : "d",
-									"type" : "rnbo",
-									"subtype" : "",
-									"embed" : 0,
-									"fileref" : 									{
-										"name" : "fast lfo panner",
-										"filename" : "slow lfo panner[1].maxsnap",
-										"filepath" : "~/Documents/Max 8/Snapshots",
-										"filepos" : -1,
-										"snapshotfileid" : "89057db43f8c525a00c3680d03ad36f9"
 									}
 
 								}
@@ -10158,40 +10330,40 @@
 									"embed" : 0,
 									"snapshot" : 									{
 										"shiftwindow" : 										{
-											"value" : 448.0
+											"value" : 7.070000000000001
 										}
 ,
 										"__presetid" : "d",
 										"shiftamount" : 										{
-											"value" : 4.488188976377953
+											"value" : 3.140000000000001
 										}
 ,
 										"delayms" : 										{
-											"value" : 0.0
+											"value" : 803.0
 										}
 ,
 										"shiftdelaysend" : 										{
-											"value" : 0.0
+											"value" : 0.590551181102362
 										}
 ,
 										"shiftfeedback" : 										{
-											"value" : 0.2
+											"value" : 0.401574803149606
 										}
 ,
 										"delayfeedback" : 										{
-											"value" : 0.0
+											"value" : 0.614173228346457
 										}
 ,
 										"wetdry" : 										{
-											"value" : 0.0
+											"value" : 0.330708661417323
 										}
 ,
 										"lfoamount" : 										{
-											"value" : 0.574803149606299
+											"value" : 0.01
 										}
 ,
 										"lfofreq" : 										{
-											"value" : 6.147637795275591
+											"value" : 0.01
 										}
 
 									}
@@ -10202,6 +10374,64 @@
 										"filepath" : "~/Documents/Max 8/Snapshots",
 										"filepos" : -1,
 										"snapshotfileid" : "62d2600674f98fa53c930d7f16df1370"
+									}
+
+								}
+, 								{
+									"filetype" : "C74Snapshot",
+									"version" : 2,
+									"minorversion" : 0,
+									"name" : "chorus-panner-pingpong",
+									"origin" : "d",
+									"type" : "rnbo",
+									"subtype" : "",
+									"embed" : 0,
+									"snapshot" : 									{
+										"shiftwindow" : 										{
+											"value" : 7.070000000000001
+										}
+,
+										"__presetid" : "d",
+										"shiftamount" : 										{
+											"value" : 3.140000000000001
+										}
+,
+										"delayms" : 										{
+											"value" : 803.0
+										}
+,
+										"shiftdelaysend" : 										{
+											"value" : 0.590551181102362
+										}
+,
+										"shiftfeedback" : 										{
+											"value" : 0.401574803149606
+										}
+,
+										"delayfeedback" : 										{
+											"value" : 0.614173228346457
+										}
+,
+										"wetdry" : 										{
+											"value" : 0.464566929133858
+										}
+,
+										"lfoamount" : 										{
+											"value" : 0.503937007874016
+										}
+,
+										"lfofreq" : 										{
+											"value" : 3.787007874015748
+										}
+
+									}
+,
+									"fileref" : 									{
+										"name" : "chorus-panner-pingpong",
+										"filename" : "default[1].maxsnap",
+										"filepath" : "~/Documents/Max 8/Snapshots",
+										"filepos" : -1,
+										"snapshotfileid" : "7435bae30354258835ec99a90ca47f64"
 									}
 
 								}
@@ -10723,14 +10953,14 @@
 		}
 ,
 		"dependency_cache" : [ 			{
-				"name" : "d lfo panner[1].maxsnap",
+				"name" : "chorus-pingpong[1].maxsnap",
 				"bootpath" : "~/Documents/Max 8/Snapshots",
 				"patcherrelativepath" : "../../Max 8/Snapshots",
 				"type" : "mx@s",
 				"implicit" : 1
 			}
 , 			{
-				"name" : "d.maxsnap",
+				"name" : "d lfo panner[1].maxsnap",
 				"bootpath" : "~/Documents/Max 8/Snapshots",
 				"patcherrelativepath" : "../../Max 8/Snapshots",
 				"type" : "mx@s",

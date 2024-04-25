@@ -6,7 +6,7 @@
 // see: https://youtu.be/l42_f9Ir8fQ?si=_1eSUs2Ipbc8S9cu
 
 
-import { createPresetSelect, presetSelected } from "./uiBuilders.js";
+import { createPresetSelect, presetSelected, updateSliders } from "./uiBuilders.js";
 import { downloadNewRecording } from './uiBuilders.js';
 //import { updateRecordingWaveform } from './uiBuilders.js';
 export const patchExportURL = "rnbo-export/shift.export.json";
@@ -77,29 +77,27 @@ export async function createRNBODevice(patchExportURL, offline) {
     mediaRecorder.ondataavailable = function(e) {
         console.log("data available");
         recordedChunks.push(e.data);
-        //updateRecordingWaveform(e.data);
     }
 
     mediaRecorder.onstop = function(e) {
         console.log("recording stopped");
-        let blob = new Blob(recordedChunks, { 'type' : 'audio/ogg; codecs=opus' });
-        //addNewRecordingPlayer(blob);    
+        let blob = new Blob(recordedChunks, { 'type' : 'audio/ogg; codecs=opus' }); 
         downloadNewRecording(blob);
-        //showFinsihedRecording(blob);
     }
 
-
+    // connect gain node to recorder
     outputGainNode.connect(streamDestination);
     
     // connect gain node to audio output
     outputGainNode.connect(context.destination);
 
+    // resume audio context on click
     document.body.onclick = () => {
         context.resume();
     }
 
+    // Get the presets from the patcher
     presets = patcher.presets || [];
-    let defaultIndex= -1;
     if (presets.length < 1) {
         console.log("No presets defined");
     } else {
@@ -109,25 +107,19 @@ export async function createRNBODevice(patchExportURL, offline) {
             console.log(`preset ${preset.name}`);
         });
         
-        // get the index of the default preset
-        for(let i = 0; i < presets.length; i++) {
-            if(presets[i].name === defaultPreset) {
-                defaultIndex = i;
-                break;
-            }
-        }
-        
     }
 
     // Set the default preset
-    device.setPreset(presets[defaultIndex].preset);
+    device.setPreset(presets[0].preset);
+
+    // update sliders
+
 
     // Create a preset select element in the output section
     let outputSection = document.getElementById("output-section");
     createPresetSelect(outputSection, presets, presetSelected);
-
-
-    //return [device, context];
+    // set the default preset
+    //selectElement.value = 1;
     
 }
 

@@ -28,6 +28,7 @@ playBackDiv.id = "playback-container";
 outputDiv.appendChild(playBackDiv);
 // buttons
 
+
 createToggleButton(playBackDiv, "play", buttonCallback);
 createToggleButton(playBackDiv, "loop", buttonCallback);
 createRecordButton(playBackDiv, "record");
@@ -88,15 +89,6 @@ createSlider(delayParentDiv, "feedback", "delayfeedback", 0, 1.0, 0.001, sliderC
 
 
 
-// record section
-let recordDiv = document.getElementById("record-section");
-
-
-
-// easy access to sliders   
-let sliders = document.querySelectorAll("input[type=range]");
-
-
 //----------------- UI BUILDERS -----------------//
 
 
@@ -111,6 +103,9 @@ function createRecordButton(parentDiv, name) {
     const button = document.createElement("button");
     button.id = name + "-button";
     button.textContent = name;
+
+    // set data-recording attribute to false
+    button.dataset.recording = "false"; 
     
     button.addEventListener("click", () => { recordNewAudioFile(); });
 
@@ -217,21 +212,22 @@ export function createPresetSelect(parentDiv, presets, presetSelected) {
         const option = document.createElement("option");
         option.value = preset.name;
         option.innerText = preset.name;
+
         select.appendChild(option);
     });
 
+    // select the default preset
+    select.selectedIndex = 0;
     
     outerDiv.appendChild(select);
     //parentDiv.appendChild(outerDiv);
     parentDiv.insertBefore(outerDiv, parentDiv.firstChild);
+
+    return select;
 }
 
 
 // -------  EVENT Callbacks  ------- //
-
-let recordWavesurfers = [];
-let record;
-let scrollingWaveform = false;
 
 
 // record button callback
@@ -251,7 +247,7 @@ function recordNewAudioFile() {
         recordButton.dataset.recording = "false";
         // the onstop event will handle the final display of recording
         
-    } else {
+    } else { // if not recording, start recording
         console.log("start recording");
         // change record button text
         recordButton.innerHTML = "recording";
@@ -263,9 +259,6 @@ function recordNewAudioFile() {
 
 }
 
-let timer;
-let newSurfer;
-let recordings = [];
 
 
 export function downloadNewRecording(blob) {
@@ -369,8 +362,6 @@ export function presetSelected() {
     // get value from select
     let presetName = this.value;
     
-    console.log("selected preset: " + presetName + " " + typeof(presetName)); 
-     
     // get preset object from name
     let preset = presets.find(p => p.name === presetName);
 
@@ -388,11 +379,14 @@ export function presetSelected() {
 
 
 // update slider display values from device parameters
-function updateSliders() {
-    sliders.forEach((element) => {
+export function updateSliders() {
 
+    let sliders = document.getElementsByClassName("slider");
+
+    for(let i = 0; i < sliders.length; i++){
+        let element = sliders.item(i);   
         const paramId = element.id.replace('-slider', '');
-        if(paramId == "output" || paramId == "wetdry") {
+        if(paramId == "output") {
             return;
         }
 
@@ -401,7 +395,7 @@ function updateSliders() {
         element.value = param.value;
         const input = document.getElementById(element.id + "-display");
         input.value = param.value;
-    });
+    };
 }
 
 // update presets select options from device
@@ -418,6 +412,7 @@ function updatePresets(presets) {
     // loop through presets and add options
     for(let i = 0; i < presets.length; i++) {
         const option = document.createElement("option");
+        console.log("preset name: " + presets[i].name + " being added at index: " + i);
         option.value = presets[i].name;
         option.innerText = presets[i].name;
         select.appendChild(option);
@@ -425,15 +420,12 @@ function updatePresets(presets) {
 
 }
 
-// callback for any slider, uses slider id to determine which parameter to set
-// reference index.html createSlider() function for slider id naming convention
+// callback for all sliders, uses slider id to determine which parameter to set
+// reference createSlider() function for slider id naming convention
 function sliderCallback() {
     const sliderId = this.id;
     const sliderValue = this.value;
     let paramId = sliderId.replace('-slider','');
-
-    console.log(`Slider ${sliderId} value: ${sliderValue}`);
-    
 
     // update input display 
     const input = document.getElementById(sliderId + "-display");

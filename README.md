@@ -1,10 +1,11 @@
 # shift
 
-development in progress
+An audio pitch-shifting creative tool. 
 
-#### a resampler
-send audio (mic or file) to this effects chain:  
-pitch shifter -> lfo panner -> ping-pong delay. 
+#### how to use:
+Drop an audio file and/or turn on your mic by clicking "mic". Make sure to use headphones while using the mic to avoid feedback. Once you have a sound you like, record the audio in real-time. When you stop  recording, you'll be prompted to download the audio file.
+
+#### signal flow diagram
 
 
 
