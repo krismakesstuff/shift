@@ -121,14 +121,19 @@ body{
 
 #title-section{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 65px 40px;
+    grid-template-columns: 1fr 3fr 2fr;
+    grid-template-rows: 65px ;
     background-color: var(--color-dark);
 
 }
 
+#title-text-container{
+    display: grid;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+}
+
 #title-text{
-    grid-row: 1 / 2;  
     font-size: 48px;
     font-weight: bold;
     font-style: italic;
@@ -139,15 +144,28 @@ body{
     padding-left: var(--side-padding);  
 }
 
+#help-text-container{
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+}
+
+#help-text{
+    font-size: 14.5px;
+    color: var(--color-light-grey);
+    text-align: left;
+    padding-left: 10px;
+}
+
 #link-container{
     display: grid;
     width: 80%;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 40px;
     grid-column: 3 / 4;
-    grid-row: 2 / 3;
+    grid-row: 1 / 2;
     background-color: var(--color-dark);
     justify-self: end;
+    padding-top: var(--vertical-padding);  
     padding-right: var(--side-padding);
 }
 
@@ -157,21 +175,6 @@ body{
     font-weight: bold;
     color: var(--color-light-white);
     justify-self: center;
-}
-
-#repo-link{
-    /* grid-column: 3 / 4; 
-    grid-row: 2 / 3;
-    
-    justify-self: end;
-    padding-right: var(--side-padding); */
-}
-
-#how-to-link{
-    /* grid-column: 3 / 4; 
-    grid-row: 2 / 3;
-    
-    justify-self: center; */
 }
 
 #input-section {
@@ -261,6 +264,34 @@ body{
     background-color: var(--color-light-grey);
 }
 
+#waveform-file-text-container{
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+    display: grid;
+    grid-template-columns: 1fr 8fr;
+    grid-template-rows: 1fr;
+    padding-left: 90px;
+}
+
+#waveform-file-text-label{
+    grid-column: 1 / 2; 
+    font-style: bold;
+    font-size: var(--text-size-large); 
+    color: var(--color-light-red);
+    justify-self: first;
+}
+
+#waveform-file-text{
+    grid-column: 2 / 3;
+    font-size: var(--text-size-normal);
+    color: var(--color-light-grey);
+    background-color: var(--color-dark);
+    justify-self: first;
+    padding-top: 6px;
+
+}
+
+
 #waveform {
     width: 100%;
     height: 100%;
@@ -291,6 +322,8 @@ body{
 #waveform[data-loading="false"] {
     background-color: var(--color-light-grey);
 }
+
+
 
 #waveform-overlay{
     z-index: 2;

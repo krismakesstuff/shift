@@ -153,20 +153,14 @@ function dropHandler(ev) {
 function loadDroppedFile(){
     if(getDroppedFile){
         
-        // var reader = new FileReader();
-        // reader.onload = function(e) {
-        //     context.decodeAudioData(e.target.result).then(function(buffer) {
-        //         createWaveform(buffer, droppedFile);
-                
-        //         console.log("Decoded audio data from file, length: " + buffer.length);
-
-        //     });
-        // }
-        // reader.readAsArrayBuffer(droppedFile);
-        
-
+        // update waveform
         updateWaveform(droppedFile);
 
+        // update text
+        const waveform = document.getElementById("waveform-file-text");
+        waveform.innerHTML = droppedFile.name;
+
+        // flip flag
         getDroppedFile = false;
     }
 }

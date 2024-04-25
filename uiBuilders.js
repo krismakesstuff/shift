@@ -27,6 +27,7 @@ let playBackDiv = document.createElement("div");
 playBackDiv.id = "playback-container";
 outputDiv.appendChild(playBackDiv);
 // buttons
+
 createToggleButton(playBackDiv, "play", buttonCallback);
 createToggleButton(playBackDiv, "loop", buttonCallback);
 createRecordButton(playBackDiv, "record");
