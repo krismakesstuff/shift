@@ -4,6 +4,8 @@ An audio pitch-shifting creative tool. The audio processing was built with Max, 
 
 live github build: https://krismakesstuff.github.io/shift/
 
+demo videos: https://www.youtube.com/watch?v=JzvFm5qHVag&list=PLiuKEx-WKKKZu05uo1tQpQ7bexYUBEdnx 
+
 #### how to use:
 - Drop an audio file and/or turn on your mic by clicking "mic". 
   - Make sure to use headphones while using the mic to avoid feedback. 
@@ -17,4 +19,5 @@ live github build: https://krismakesstuff.github.io/shift/
 # todo: 
 - presets not working correctly.
 - account for mono files. 
+- clean up code
 - midi input?
