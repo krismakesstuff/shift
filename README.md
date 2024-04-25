@@ -10,7 +10,7 @@ live github build: https://krismakesstuff.github.io/shift/
 - Find a sound you like 
 - record the audio in real-time by clicking "record". When you stop  recording, you'll be prompted to download the audio file.
 
-#### signal flow diagram
+#### signal flow diagram:
 <img src="./shift-signalflow.drawio.svg">
 
 
