@@ -8,7 +8,7 @@ An audio pitch-shifting creative tool.
 - record the audio in real-time by clicking "record". When you stop  recording, you'll be prompted to download the audio file.
 
 #### signal flow diagram
-<img src="./shift-signalflow.drawio.svg">
+<!-- <img src="./shift-signalflow.drawio.svg"> -->
 
 
 # todo: 
