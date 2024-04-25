@@ -15,7 +15,18 @@ import { outputGainNode } from "./rnbo-helpers.js";
 // create and add Toggle Buttons for play and loop 
 let inputSection = document.getElementById("input-section");
 
-createToggleButton(inputSection, "mic", buttonCallback);
+let micSection = document.createElement("div");
+micSection.id = "mic-container";
+
+let micLabel = document.createElement("div");   
+micLabel.className = "warning-label";
+micLabel.id = "mic-label"; 
+micLabel.innerHTML = "Use headphones to avoid feedback.";
+
+createToggleButton(micSection, "mic", buttonCallback);
+micSection.appendChild(micLabel);
+
+inputSection.appendChild(micSection);
 
 // output section parameters
 let outputDiv = document.getElementById("output-section");
@@ -129,7 +140,7 @@ function createSlider(parentDiv, displayName, paramID, min, max, step, callback)
     slider.type = "range";
     slider.min = min;
     slider.max = max;
-    slider.value = (max - min) / 2;
+    //slider.value = (max - min) / 2;
     slider.step = step;
     slider.id = paramID + "-slider";
     slider.name = paramID;
@@ -217,7 +228,7 @@ export function createPresetSelect(parentDiv, presets, presetSelected) {
     });
 
     // select the default preset
-    select.selectedIndex = 0;
+    //select.selectedIndex = 0;
     
     outerDiv.appendChild(select);
     //parentDiv.appendChild(outerDiv);

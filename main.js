@@ -28,7 +28,7 @@ async function setupRNBO() {
     createWaveform();
 
     // update sliders from rnbo device
-    updateSliders();
+    //updateSliders();
 }
 
 

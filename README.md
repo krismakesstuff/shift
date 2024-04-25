@@ -1,6 +1,6 @@
 # shift
 
-An audio pitch-shifting creative tool. 
+An audio pitch-shifting creative tool. The audio processing was built with Max, exported to a web target via RNBO. UI is vanilla JS.
 
 #### how to use:
 - Drop an audio file and/or turn on your mic by clicking "mic". - Make sure to use headphones while using the mic to avoid feedback. 
@@ -12,6 +12,6 @@ An audio pitch-shifting creative tool.
 
 
 # todo: 
-- when playing dropped file, make sure to account for mono and stereo. 
-- reset prest values now that min and maxes have changed
+- presets not working correctly.
+- account for mono files. 
 - midi input?

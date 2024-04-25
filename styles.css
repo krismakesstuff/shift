@@ -110,8 +110,10 @@ body{
 #title-section{
     display: grid;
     grid-template-columns: 155px 3fr 2fr;
-    grid-template-rows: 1fr ;
+    grid-template-rows: 1fr;
     background-color: var(--color-dark);
+    padding-bottom: 5px;
+    padding-top: 5px;   
 
 }
 
@@ -139,7 +141,7 @@ body{
     grid-row: 1 / 2;
     padding-left: 10px; 
     justify-items: left;
-    align-items: center;    
+    align-items: end;    
 }
 
 #help-text{
@@ -174,7 +176,7 @@ body{
 
 #input-section {
     display: grid;
-    grid-template-columns: 75px 1fr;
+    grid-template-columns: 100px 1fr;
     grid-template-rows: 100px;
     padding-left: var(--side-padding);
     padding-right: var(--side-padding); 
@@ -190,13 +192,25 @@ body{
     height: 100%;
 }
 
-#mic{
+#mic-container{
+    display: grid;
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     
 }
 
+#mic-label{
+    grid-row: 2/3;
+    font-size: var(--text-size-small);
+    color: var(--color-dark-grey);
+    align-self: start;
+    justify-self: center;
+    padding-top: 5px;   
+
+}
+
 #mic-button{
+    grid-row: 1 / 2;
     font-family: var(--text-font-family);
     font-style: bold;
     font-size: var(--text-size-large);
@@ -206,7 +220,7 @@ body{
     background-color: var(--color-light-red);
     border: none;
     border-radius: var(--border-radius-small);
-    align-self: center;
+    align-self: end;
 }
 
 #mic-button[data-state="on"]{
