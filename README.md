@@ -17,7 +17,8 @@ demo videos: https://www.youtube.com/watch?v=JzvFm5qHVag&list=PLiuKEx-WKKKZu05uo
 
 
 # todo: 
-- presets not working correctly.
-- account for mono files. 
+- download file not working on mac
+- presets not working correctly
+- account for mono files
 - clean up code
 - midi input?
