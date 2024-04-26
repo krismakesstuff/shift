@@ -5,9 +5,7 @@ import { device } from "./rnbo-helpers.js";
 import { context } from "./rnbo-helpers.js";
 import { presets } from "./rnbo-helpers.js";
 import { toggleMicInput } from "./main.js";
-import { audioElement } from "./main.js";
 import { mediaRecorder } from "./rnbo-helpers.js";
-import { recordedChunks } from "./rnbo-helpers.js";
 import { outputGainNode } from "./rnbo-helpers.js";
 
 // -------  UI Elements  ------- //
@@ -103,7 +101,7 @@ createSlider(delayParentDiv, "feedback", "delayfeedback", 0, 1.0, 0.001, sliderC
 //----------------- UI BUILDERS -----------------//
 
 
-// create a print button for the output buffer
+// create a record button for the output buffer
 function createRecordButton(parentDiv, name) {
     // create outer div
     const outerDiv = document.createElement("div");
@@ -273,98 +271,19 @@ function recordNewAudioFile() {
 
 
 export function downloadNewRecording(blob) {
+
     let downloadLink = document.getElementById("download-link");    
     let url = URL.createObjectURL(blob);
     downloadLink.href = url;
     downloadLink.download = "shift-recording-" + Date.now() +".wav";
     downloadLink.click();
+
+    // blob.arrayBuffer().then((buffer) => {
+    //     let newBlob = bufferToWave(buffer, buffer.length);
+        
+        
+    // });
 }   
-
-
-
-// add new recording player to record section
-// export function addNewRecordingPlayer(blob) {
-
-//     // generate unique id for recording
-//     let newId = "-" + Date.now();
-
-//     // create parent div
-//     const outerDiv = document.createElement("div");
-//     outerDiv.className = "recording-container";
-//     outerDiv.id = "recording-container" + newId;
-//     // add play and download buttons
-//     const playButton = document.createElement("button");
-//     playButton.className = "recorded-play-button";
-//     playButton.id = "recorded-play-button" + newId;
-//     playButton.innerHTML = "play";
-//     playButton.addEventListener("click", () => {
-//         let id = playButton.id.replace("recorded-play-button", "");
-//         // if playing, stop
-//         if(playButton.dataset.state === "on"){
-//             playButton.dataset.state = "off";
-//             playButton.innerHTML = "play";
-//             recordings.find(r => r.id === id).surfer.stop();
-//         } else {
-//             playButton.dataset.state = "on";    
-//             playButton.innerHTML = "stop";
-//             // stop other recordings
-//             recordings.forEach(r => r.surfer.stop());
-//             recordings.find(r => r.id === id).surfer.play();
-
-//         }
-//      });
-    
-//     const downloadButton = document.createElement("button");
-//     downloadButton.className = "recorded-download-button";
-//     downloadButton.id = "recorded-download-button" + newId; 
-//     downloadButton.innerHTML = "download";
-//     downloadButton.addEventListener("click", () => { 
-//         let downloadLink = document.createElement("a");
-//         downloadLink.id = "download-link" + newId;
-//         downloadLink.href = url;
-//         downloadLink.download = "recording" + newId + ".wav";   
-//         outerDiv.appendChild(downloadLink);
-//         downloadLink.click();
-//      });
-    
-//     // add container to record section
-//     let recordSection = document.getElementById("record-section");
-//     recordSection.appendChild(outerDiv);
-
-//     // create audio element
-//     let url = URL.createObjectURL(blob);
-//     let audio = document.createElement("audio");
-//     audio.class = "recorded-audio";
-//     audio.id = "recorded-audio" + newId;
-//     audio.controls = true;
-//     audio.src = url;
-    
-//     // create new wavesurfer instance
-//     newSurfer = WaveSurfer.create({
-//         container: outerDiv,
-//         waveColor: '#E5383b',
-//         progressColor: '#383351',
-//         height: 50,
-//         media: audio,
-//         splitChannels: true,
-//     });
-
-    
-//     wavesurfer.on('finish', function (){
-//         playButton.click();
-//     });
-
-//     let obj = {id: newId, surfer: newSurfer, container: outerDiv};
-//     recordings.push(obj);
-//     console.log("recording added: " + obj.id + " " + obj.surfer);
-
-
-//     outerDiv.appendChild(playButton);
-//     outerDiv.appendChild(downloadButton);
-    
-
-
-// }
 
 
 // preset select callback
@@ -663,6 +582,8 @@ function bufferToWave(abuffer, len) {
         offset = 0,
         pos = 0;
   
+        console.log("view: " + view.byteOffset + " " + view.byteLength + " " + view.byteOffset + view.byteLength);   
+
     // write WAVE header
     setUint32(0x46464952);                         // "RIFF"
     setUint32(length - 8);                         // file length - 8
@@ -706,7 +627,6 @@ function bufferToWave(abuffer, len) {
     let blob = new Blob([buffer], {type: "audio/wav"});
     console.log("Blob: " + blob.type + " " + blob.size + " bytes");
     return blob;
-    //return new Blob([buffer], {type: "audio/wav"});
   
     function setUint16(data) {
       view.setUint16(pos, data, true);
@@ -718,38 +638,5 @@ function bufferToWave(abuffer, len) {
       pos += 4;
     }
 }
-
-function make_download(abuffer, total_samples) {
-
-    // get duration and sample rate
-    var duration = abuffer.duration,
-        rate = abuffer.sampleRate,
-        offset = 0;
-
-    var new_file = URL.createObjectURL(bufferToWave(abuffer, total_samples));
-
-    // var name = generateFileName();
-    // var download_link = document.getElementById("download_link");
-    // download_link.href = new_file;
-    // download_link.download = name;
-
-    window.open(new_file);
-
-}
-
-function generateFileName() {
-//   var origin_name = fileInput.files[0].name;
-//   var pos = origin_name.lastIndexOf('.');
-//   var no_ext = origin_name.slice(0, pos);
-
-//   return no_ext + ".compressed.wav";
-
-    return "output.wav";
-}
-
-
-
-
-// ------ Waveform Overlay ------ //
 
 

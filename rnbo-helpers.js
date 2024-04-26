@@ -67,7 +67,11 @@ export async function createRNBODevice(patchExportURL, offline) {
 
     // connect gain node to recorder
     let streamDestination = context.createMediaStreamDestination();
-    mediaRecorder = new MediaRecorder(streamDestination.stream);
+    let audioType = 'audio/webm';   
+    const recordingOptions = { mimeType: audioType};
+    mediaRecorder = new MediaRecorder(streamDestination.stream, recordingOptions);
+
+    console.log("recoder supported: " + MediaRecorder.isTypeSupported(audioType));
 
     mediaRecorder.onstart = function(e) {
         console.log("recording started");
@@ -81,7 +85,7 @@ export async function createRNBODevice(patchExportURL, offline) {
 
     mediaRecorder.onstop = function(e) {
         console.log("recording stopped");
-        let blob = new Blob(recordedChunks, { 'type' : 'audio/ogg; codecs=opus' }); 
+        let blob = new Blob(recordedChunks, { 'type' : audioType }); 
         downloadNewRecording(blob);
     }
 
