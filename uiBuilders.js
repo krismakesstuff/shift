@@ -275,7 +275,7 @@ export function downloadNewRecording(blob) {
     let downloadLink = document.getElementById("download-link");    
     let url = URL.createObjectURL(blob);
     downloadLink.href = url;
-    downloadLink.download = "shift-recording-" + Date.now() +".wav";
+    downloadLink.download = "shift-recording-" + Date.now();
     downloadLink.click();
 
     // blob.arrayBuffer().then((buffer) => {

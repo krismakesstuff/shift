@@ -18,17 +18,17 @@ export const audioElement = document.getElementById("audio");
 
 // setup rnbo device
 async function setupRNBO() {
-    await createRNBODevice(patchExportURL);
-    console.log("RNBO Device Created");
 
-    if(!device) {
-        console.log("Device not found");
-    } 
+    try{
+        await createRNBODevice(patchExportURL);
+        console.log("RNBO Device Created");
+        createWaveform();
 
-    createWaveform();
+    } catch (err) {
+        console.log("Error creating RNBO device");
+        console.log(err);
+    }
 
-    // update sliders from rnbo device
-    //updateSliders();
 }
 
 

@@ -8,7 +8,6 @@
 
 import { createPresetSelect, presetSelected, updateSliders } from "./uiBuilders.js";
 import { downloadNewRecording } from './uiBuilders.js';
-//import { updateRecordingWaveform } from './uiBuilders.js';
 export const patchExportURL = "rnbo-export/shift.export.json";
 
 let response, patcher;
