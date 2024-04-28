@@ -9,8 +9,6 @@ import { mediaRecorder } from "./rnbo-helpers.js";
 import { outputGainNode } from "./rnbo-helpers.js";
 
 
-let date = Date.now();
-console.log("Date now: " + date);
 // -------  UI Elements  ------- //
 
 // create and add Toggle Buttons for play and loop 
@@ -276,8 +274,7 @@ function recordNewAudioFile() {
 export function downloadNewRecording(blob) {
 
     let downloadLink = document.getElementById("download-link"); 
-    let fileName = "shift-recording-" + (Date.now() - date) + ".wav";
-    const file = new File([blob], fileName, {type: "audio/wav"});   
+    const file = new File([blob], fileName, {type: 'audio/wav'});   
     let url = URL.createObjectURL(file);
 
     console.log("url: " + url);
@@ -289,9 +286,13 @@ export function downloadNewRecording(blob) {
         console.log("file made, reading.. ");
         const result = fr.result;
 
-        //downloadLink.href = result.data.url;
-
         console.log(result);
+        //console.log("result data url: " + result.data.url);
+
+        downloadLink.href = url;
+        downloadLink.download = fileName;
+        downloadLink.click();
+        
     }
 
 

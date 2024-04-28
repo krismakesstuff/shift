@@ -19,7 +19,11 @@ export let device;
 const WAContext = window.AudioContext || window.webkitAudioContext;
 export const context = new WAContext();
 export let outputGainNode = context.createGain();
+
 export let mediaRecorder;
+
+let date = Date.now();
+console.log("Date now: " + date);
 let recordedBlob = [];
 
 export async function createRNBODevice(patchExportURL) {
@@ -87,7 +91,18 @@ export async function createRNBODevice(patchExportURL) {
         let blob = new Blob(recordedBlob, { type: 'audio/wav' }); 
         console.log("new blob...");
         console.log(blob);
-        downloadNewRecording(blob);
+
+
+        let downloadLink = document.getElementById("download-link"); 
+        let fileName = "shift-recording-" + (Date.now() - date) + ".wav";
+        let url = URL.createObjectURL(blob);
+        
+        downloadLink.href =url;  
+        downloadLink.download = fileName;
+
+        downloadLink.click();
+
+        //downloadNewRecording(blob);
     }
 
     // connect gain node to recorder
