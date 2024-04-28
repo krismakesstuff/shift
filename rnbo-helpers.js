@@ -69,12 +69,38 @@ export async function createRNBODevice(patchExportURL) {
 
     // connect gain node to recorder
     let streamDestination = context.createMediaStreamDestination();
+    let options = {
+        mimeType: 'audio/mpeg',
+    }
     mediaRecorder = new MediaRecorder(streamDestination.stream);
 
+    const types = [
+        "video/webm",
+        "audio/webm",
+        "video/webm;codecs=vp8",
+        "video/webm;codecs=daala",
+        "video/webm;codecs=h264",
+        "audio/webm;codecs=opus",
+        "video/mp4",
+        "audio/mpeg", 
+        "audio/wav",
+    ];
+      
+    for (const type of types) {
+        console.log(
+            `Is ${type} supported? ${
+            MediaRecorder.isTypeSupported(type) ? "Yes!" : "Nope :("
+            }`,
+        );
+    }
+      
 
     // Media Recorder Event onstart
     mediaRecorder.onstart = function(e) {
+
         console.log("recording started");
+        
+
         recordedBlob = [];
     }
 
@@ -88,19 +114,19 @@ export async function createRNBODevice(patchExportURL) {
     mediaRecorder.onstop = function(e) {
         console.log("recording stopped");
         console.log(recordedBlob);
-        let blob = new Blob(recordedBlob, { type: 'audio/wav' }); 
+        let blob = new Blob(recordedBlob, { type: 'audio/mpeg' }); 
         console.log("new blob...");
         console.log(blob);
 
 
         let downloadLink = document.getElementById("download-link"); 
-        let fileName = "shift-recording-" + (Date.now() - date) + ".wav";
+        let fileName = "shift-recording-" + (Date.now() - date) + ".mp3";
         let url = URL.createObjectURL(blob);
         
         downloadLink.href =url;  
         downloadLink.download = fileName;
 
-        downloadLink.click();
+        //downloadLink.click();
 
         //downloadNewRecording(blob);
     }
