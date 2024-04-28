@@ -20,10 +20,9 @@ const WAContext = window.AudioContext || window.webkitAudioContext;
 export const context = new WAContext();
 export let outputGainNode = context.createGain();
 export let mediaRecorder;
-export let recordedChunks = [];
+let recordedBlob = [];
 
-export async function createRNBODevice(patchExportURL, offline) {
-    
+export async function createRNBODevice(patchExportURL) {
     
     
     // Fetch the exported patcher
@@ -66,25 +65,28 @@ export async function createRNBODevice(patchExportURL, offline) {
 
     // connect gain node to recorder
     let streamDestination = context.createMediaStreamDestination();
-    let audioType = 'audio/webm';   
-    const recordingOptions = { mimeType: audioType};
-    mediaRecorder = new MediaRecorder(streamDestination.stream, recordingOptions);
+    mediaRecorder = new MediaRecorder(streamDestination.stream);
 
-    console.log("recoder supported: " + MediaRecorder.isTypeSupported(audioType));
 
+    // Media Recorder Event onstart
     mediaRecorder.onstart = function(e) {
         console.log("recording started");
-        recordedChunks = [];
+        recordedBlob = [];
     }
 
+    // Media Recorder Event ondataavailable, fires when done or manually triggered
     mediaRecorder.ondataavailable = function(e) {
         console.log("data available");
-        recordedChunks.push(e.data);
+        recordedBlob.push(e.data);
     }
 
+    // Media Recorder Event onstop
     mediaRecorder.onstop = function(e) {
         console.log("recording stopped");
-        let blob = new Blob(recordedChunks, { 'type' : audioType }); 
+        console.log(recordedBlob);
+        let blob = new Blob(recordedBlob, { type: 'audio/wav' }); 
+        console.log("new blob...");
+        console.log(blob);
         downloadNewRecording(blob);
     }
 

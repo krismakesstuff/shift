@@ -8,6 +8,9 @@ import { toggleMicInput } from "./main.js";
 import { mediaRecorder } from "./rnbo-helpers.js";
 import { outputGainNode } from "./rnbo-helpers.js";
 
+
+let date = Date.now();
+console.log("Date now: " + date);
 // -------  UI Elements  ------- //
 
 // create and add Toggle Buttons for play and loop 
@@ -272,17 +275,33 @@ function recordNewAudioFile() {
 
 export function downloadNewRecording(blob) {
 
-    let downloadLink = document.getElementById("download-link");    
-    let url = URL.createObjectURL(blob);
-    downloadLink.href = url;
-    downloadLink.download = "shift-recording-" + Date.now();
-    downloadLink.click();
+    let downloadLink = document.getElementById("download-link"); 
+    let fileName = "shift-recording-" + (Date.now() - date) + ".wav";
+    const file = new File([blob], fileName, {type: "audio/wav"});   
+    let url = URL.createObjectURL(file);
 
-    // blob.arrayBuffer().then((buffer) => {
-    //     let newBlob = bufferToWave(buffer, buffer.length);
-        
-        
-    // });
+    console.log("url: " + url);
+    const fr = new FileReader();
+
+    fr.readAsDataURL(blob);
+
+    fr.onload = function() {
+        console.log("file made, reading.. ");
+        const result = fr.result;
+
+        //downloadLink.href = result.data.url;
+
+        console.log(result);
+    }
+
+
+    // console.log("new file..");
+    // console.log(file);
+
+    // downloadLink.href = url;
+    // downloadLink.download = fileName;
+    // downloadLink.click();
+
 }   
 
 
@@ -440,132 +459,6 @@ function toggleLoopButton(newState) {
 
 
 
-
-// print audio to file
-function printAudioToFile(bufferId) {
-    console.log("print button clicked");
-    
-    //var wetbuffer;
-
-    if(device.isValid){       
-        console.log("RNBO device found in printAudioToFile " + device.node); 
-        console.log("numChannels: " + device.numOutputChannels);
-        function getBufferFromLiveDevice(device) {
-            return new Promise((resolve, reject) => {
-                device.releaseDataBuffer(bufferId)
-                    .then((rnbobuffer) => {
-                        let ab = rnbobuffer.getAsAudioBuffer(device.context);
-                        console.log("wetbuffer found in RNBO device: " + ab.length + " samples");
-                        resolve(ab);
-                    }).catch((error) => {
-                        console.log("error getting buffer: " + error);
-                        reject(error);
-                    }); 
-            });
-        }
-
-        getBufferFromLiveDevice(device)
-            .then((buffer) => {
-                console.log("buffer found");
-                // calculate buffer legnth based off current parameters
-                let bufferLength = getBufferLengthInSamples(buffer);
-                
-                // create offline device, wrap in promise to wait for device to be created
-                const offlineDevice = function(bufferLength, device) {
-                    return new Promise((resolve, reject) => {
-                        createOfflineContextAndRNBODevice(patchExportURL, bufferLength)
-                        .then((offlineDevice) => {
-                            // pass current device parameters to offline device
-                            offlineDevice.parameters = device.parameters;
-                            offlineDevice.setDataBuffer('wetbuffer', buffer);
-                            offlineDevice.setDataBuffer('drybuffer', buffer);
-                            console.log("offline device created");
-                            resolve(offlineDevice);
-                        }).catch((error) => {
-                            console.log("error creating offline device: " + error);
-                            reject(error);
-                        });
-                    });
-                }
-                    
-                
-                
-                offlineDevice(bufferLength, device).then((offlineDevice) => {
-                    
-                    
-                    // connect offline device to offline context
-                    offlineDevice.node.connect(offlineDevice.context.destination);
-                    
-
-
-                    console.log("offline device connected to context");
-                    console.log("offline device: " + offlineDevice.node);
-                    console.log("offline context: " + offlineDevice.context);
-                    
-                    offlineDevice.parametersById.get("play").value = 1;
-
-                    for(let i = 0; i < offlineDevice.parameters.length; i++){
-                        console.log("offline device parameter: " + offlineDevice.parameters[i].name);
-                        console.log("offline device parameter value: " + offlineDevice.parameters[i].value)
-                    }
-
-                    // start rendering
-                    offlineDevice.context.startRendering()
-                    .then(function(renderedBuffer){
-                        console.log("rendering complete");
-                        console.log("rendered buffer: " + renderedBuffer);
-                        // make download link
-                        make_download(renderedBuffer, bufferLength);
-                    });
-                    }).catch((error) => {
-                        console.log("error rendering offline device: " + error);
-                });
-
-            }).catch((error) => {
-                console.log("error getting buffer from device: " + error);
-            });   
-        
-        
-        
-
-    } else {
-        console.log("no RNBO device found in printAudioToFile");
-    }
-
-
-}
-
-// get buffer length based off current parameters
-function getBufferLengthInSamples(wetbuffer) {
-
-    console.log("buffer passed: " + wetbuffer);
-
-    let currentBufferLength;
-
-    if(wetbuffer.length > 0){
-        currentBufferLength = wetbuffer.length;
-    } else {
-        console.log("no buffer size, when calculating buffer length");
-        currentBufferLength = 0;
-    }
-
-    let bufferLength;
-    let playbackrate = device.parametersById.get("playbackrate").value;
-    let shiftamount = device.parametersById.get("shiftamount").value;
-    let shiftwindow = device.parametersById.get("shiftwindow").value;
-    let delayms = device.parametersById.get("delayms").value;
-    let lfofreq = device.parametersById.get("lfofreq").value;
-    let lfoamount = device.parametersById.get("lfoamount").value;
-    let delayfeedback = device.parametersById.get("delayfeedback").value;
-    let shiftdelaysend = device.parametersById.get("shiftdelaysend").value;
-    let wetdry = device.parametersById.get("wetdry").value;
-
-    // calculate buffer length in seconds
-    
-    bufferLength = currentBufferLength; // temp buffer length 
-
-    return bufferLength;
-}
 
 // vvvv  NOT MY CODE vvvv
 // Credit to: https://russellgood.com/how-to-convert-audiobuffer-to-audio-file/

@@ -27,6 +27,7 @@ async function setupRNBO() {
     } catch (err) {
         console.log("Error creating RNBO device");
         console.log(err);
+        throw err;
     }
 
 }
