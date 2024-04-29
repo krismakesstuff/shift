@@ -69,7 +69,7 @@ parametersSection.appendChild(delayParentDiv);
 let shiftLabel = document.createElement("div");
 shiftLabel.className = "parameter-label";
 shiftLabel.id = "shift-label";
-shiftLabel.innerHTML = "shift";
+shiftLabel.innerHTML = "SHIFT";
 shiftParentDiv.appendChild(shiftLabel);
 // shift parameters
 createSlider(shiftParentDiv, "window", "shiftwindow", 0, 1000, 0.001, sliderCallback);
@@ -80,7 +80,7 @@ createSlider(shiftParentDiv, "feedback", "shiftfeedback", 0.001, 0.8, 0.001, sli
 let lfoLabel = document.createElement("div");
 lfoLabel.className = "parameter-label";
 lfoLabel.id = "lfo-label";
-lfoLabel.innerHTML = "lfo panner";
+lfoLabel.innerHTML = "LFO PANNER";
 lfoParentDiv.appendChild(lfoLabel); 
 // lfo parameters
 createSlider(lfoParentDiv, "frequency", "lfofreq", 0, 15, 0.01, sliderCallback); 
@@ -90,7 +90,7 @@ createSlider(lfoParentDiv, "depth", "lfoamount", 0, 1.0, 0.001, sliderCallback);
 let delayLabel = document.createElement("div");
 delayLabel.className = "parameter-label";
 delayLabel.id = "delay-label";
-delayLabel.innerHTML = "delay";
+delayLabel.innerHTML = "DELAY";
 delayParentDiv.appendChild(delayLabel);
 // delay parameters
 createSlider(delayParentDiv, "amount", "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);

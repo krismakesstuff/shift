@@ -354,7 +354,7 @@ body{
     grid-area: "parameters-section";
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr;
-    grid-gap: 50px;
+    grid-gap: 100px;
     padding-left: var(--side-padding);
     padding-right: var(--side-padding);
 
