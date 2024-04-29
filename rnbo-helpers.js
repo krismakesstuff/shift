@@ -149,36 +149,39 @@ export async function createRNBODevice(patchExportURL) {
             downloadLink.download = fileName;
             downloadLink.click();
         }
+        else {
 
-        const reader = new FileReader();
-        //let arrayBuffer;
+            const reader = new FileReader();
+    
+            // returns and array buffer
+            reader.onloadend = function() {
+                console.log("FileReader onloadend");
+                console.log(reader.result);
+    
+                // decode audio data
+                context.decodeAudioData(reader.result, function(audioBuffer) {
+                    console.log("Decoded audio data");
 
-        // returns and array buffer
-        reader.onloadend = function() {
-            console.log("FileReader onloadend");
-            console.log(reader.result);
-            //arrayBuffer = reader.result;
-
-            // decode audio data
-            context.decodeAudioData(reader.result, function(audioBuffer) {
-                console.log("Decoded audio data");
-                const waveBlob = bufferToWave(audioBuffer, audioBuffer.length);
-
-                let url = URL.createObjectURL(waveBlob);
-                console.log("waveBlob url: " + url);
-                let downloadLink = document.getElementById("download-link"); 
-                let fileName = "shift-recording-" + (Date.now() - date);
-                
-                downloadLink.href = url;  
-                downloadLink.download = fileName;
-                downloadLink.click();
-
-            }, function(e){"Error with decoding audio data" + e.err});
-
+                    // writes the wave header for file
+                    const waveBlob = bufferToWave(audioBuffer, audioBuffer.length);
+    
+                    let url = URL.createObjectURL(waveBlob);
+                    console.log("waveBlob url: " + url);
+                    let downloadLink = document.getElementById("download-link"); 
+                    let fileName = "shift-recording-" + (Date.now() - date);
+                    
+                    // downloads the file
+                    downloadLink.href = url;  
+                    downloadLink.download = fileName;
+                    downloadLink.click();
+    
+                }, function(e){"Error with decoding audio data" + e.err});
+    
+            }
+    
+            // reads blob as an ArrayBuffer
+            reader.readAsArrayBuffer(recordedBlob[0]);
         }
-
-        // reads blob as an ArrayBuffer
-        //reader.readAsArrayBuffer(recordedBlob[0]);
 
         
     }
