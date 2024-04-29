@@ -1,6 +1,8 @@
 # shift
 
-An audio pitch-shifting creative tool. The audio processing was built with Max, exported to a web target via RNBO. UI is vanilla JS.
+A browser based audio pitch-shifting creative tool. Upload files and/or use your mic to create pitch shifting beauty (or mayhem). Then record the ouput to use in your project. Intended to be a free accessible tool for sound design or live performance.
+
+The audio processing was built with Max, exported to a web target via RNBO. UI is vanilla JS.
 
 #### How to use:
 1. Drop an audio file and/or turn on your mic by clicking "mic". 
