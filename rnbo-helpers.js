@@ -27,6 +27,14 @@ let date = Date.now();
 console.log("Date now: " + date);
 let recordedBlob = [];
 
+var isSafari = window.safari !== undefined;
+if (isSafari){
+    console.log("Safari, yeah!");
+} else {
+    console.log("Not Safari");
+} 
+
+
 export async function createRNBODevice(patchExportURL) {
     
     
@@ -70,11 +78,23 @@ export async function createRNBODevice(patchExportURL) {
 
     // connect gain node to recorder
     let streamDestination = context.createMediaStreamDestination();
-    let options = {
-        mimeType: 'audio/webm;codecs=pcm',
-    }
-    mediaRecorder = new MediaRecorder(streamDestination.stream, options);
 
+
+    let options; 
+
+    if (isSafari) {
+        options = {
+            mimeType: "audio/mp4",
+        };
+    } else {
+        options = {
+            mimeType: 'audio/webm;codecs=pcm',
+        };
+    }
+
+    // let options = {
+    //     mimeType: 'audio/webm;codecs=pcm',
+    // }
     
     const types = [
         "audio/webm",
@@ -82,6 +102,8 @@ export async function createRNBODevice(patchExportURL) {
         "audio/webm;codecs=opus",
         "audio/mpeg", 
         "audio/wav",
+        "audio/aac",
+        "audio/mp4",
     ];
       
     for (const type of types) {
@@ -91,6 +113,10 @@ export async function createRNBODevice(patchExportURL) {
             }`,
         );
     }
+    
+    mediaRecorder = new MediaRecorder(streamDestination.stream, options);
+
+    
       
 
     // Media Recorder Event onstart
@@ -112,6 +138,17 @@ export async function createRNBODevice(patchExportURL) {
         console.log("recording stopped");
         console.log(recordedBlob);
         
+        if (mediaRecorder.mimeType == "audio/mp4"){
+            let mp4Blob = new Blob(recordedBlob, {type: "audio/mp4"});
+            let url = URL.createObjectURL(mp4Blob);
+
+            let downloadLink = document.getElementById("download-link");
+            let fileName = "shift-recording-" + (Date.now() - date);
+
+            downloadLink.href = url;  
+            downloadLink.download = fileName;
+            downloadLink.click();
+        }
 
         const reader = new FileReader();
         //let arrayBuffer;
@@ -141,7 +178,7 @@ export async function createRNBODevice(patchExportURL) {
         }
 
         // reads blob as an ArrayBuffer
-        reader.readAsArrayBuffer(recordedBlob[0]);
+        //reader.readAsArrayBuffer(recordedBlob[0]);
 
         
     }
