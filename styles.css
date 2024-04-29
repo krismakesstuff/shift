@@ -1,17 +1,5 @@
 :root {
 
-    /* --color-taupe: #463f3a;
-    --color-battleship-grey: #8a817c;
-    --color-silver: #bcb8b1;
-    --color-isabeline: #f4f3ee;
-    --color-melon: #e0afa0;
-
-    --color-primary: var(--color-taupe);
-    --color-secondary: var(--color-battleship-grey);
-    --color-tertiary: var(--color-silver);
-    --color-accent: var(--color-isabeline);
-    --color-text: var(--color-melon); */
-
     --color-dark: #161a1d;
     --color-dark-transparent: rgba(22, 26, 29, 0.8);
     --color-darkest-red: #660708;
@@ -67,10 +55,7 @@ input[type="number"]{
     justify-self: end;
 }
 
-
 label{
-
-    /* padding: 5px; */
     align-self: start;
 }
 
@@ -87,7 +72,6 @@ label{
     grid-column: 1 / 3; 
     grid-row: 2 / 3;
     width: 100%;
-
 }
 
 .slider-label{
@@ -100,11 +84,9 @@ label{
     justify-self: center;
 }
 
-
 body{
     display: grid;  
     background-color: var(--color-dark);
-
 }
 
 #title-section{
@@ -114,7 +96,6 @@ body{
     background-color: var(--color-dark);
     padding-bottom: 5px;
     padding-top: 5px;   
-
 }
 
 #title-text-container{
@@ -132,7 +113,6 @@ body{
     background-color: var(--color-secondary);
     text-transform: var(--text-transform);
     text-align: left;
-    
 }
 
 #help-text-container{
@@ -166,7 +146,6 @@ body{
 }
 
 .help-link{
-
     font-size: var(--text-size-small);
     font-weight: bold;
     color: var(--color-light-grey);
@@ -196,7 +175,6 @@ body{
     display: grid;
     grid-column: 1 / 2;
     grid-row: 1 / 2;
-    
 }
 
 #mic-label{
@@ -206,7 +184,6 @@ body{
     align-self: start;
     justify-self: center;
     padding-top: 5px;   
-
 }
 
 #mic-button{
@@ -243,7 +220,6 @@ body{
     background-color: var(--color-light-red);
     border: none;
     border-radius: var(--border-radius-small);
-    /* align-self: center; */
 }
 
 #play-button[data-state="on"]{
@@ -264,7 +240,6 @@ body{
     background-color: var(--color-light-red);
     border: none;
     border-radius: var(--border-radius-small);
-    /* align-self: center; */
 }
 
 #loop-button[data-state="on"]{
@@ -301,9 +276,7 @@ body{
     background-color: var(--color-dark);
     justify-self: first;
     padding-top: 6px;
-
 }
-
 
 #waveform {
     width: 100%;
@@ -336,8 +309,6 @@ body{
     background-color: var(--color-light-grey);
 }
 
-
-
 #waveform-overlay{
     z-index: 2;
     display: block;
@@ -346,7 +317,6 @@ body{
     background-color: var(--color-dark-transparent);
     border-radius: var(--border-radius-small);
     padding: 10px;
-
 }
 
 #parameters-section {
@@ -357,14 +327,11 @@ body{
     grid-gap: 100px;
     padding-left: var(--side-padding);
     padding-right: var(--side-padding);
-
     padding-bottom: var(--vertical-padding);
     background-color: var(--color-dark);
-    
 }
 
 .parameter-label {
-    
     color: var(--color-dark);
     font-size: var(--text-size-large);
     font-weight: bold;
@@ -381,7 +348,6 @@ body{
     padding: 10px;
     background-color: var(--color-light-grey);    
     border-radius: var(--border-radius-small);
-    /* box-shadow: 5px 5px var(--border-radius-small) 5px var(--color-light-white); */
 }
 
 #output-section {
@@ -394,7 +360,6 @@ body{
     padding-top: var(--vertical-padding);
     padding-bottom: var(--vertical-padding);
     background-color: var(--color-dark);
-
 }
 
 #playback-container{
@@ -404,7 +369,6 @@ body{
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr;
     grid-gap: 5px;
-
 }
 
 #record-button-container{
@@ -423,7 +387,6 @@ body{
     background-color: var(--color-light-grey);
     border: none;
     border-radius: var(--border-radius-small);
-    /* align-self: center; */
 }
 
 #record-button[data-recording="true"]{
@@ -475,7 +438,6 @@ body{
     background-color: var(--color-light-grey);
 }   
 
-
 #preset-label{
     color: var(--color-light-grey);
 }
@@ -501,11 +463,8 @@ body{
     height: 60%;
     width: 85%;
     align-self: center;
-    justify-self: first;   
-    /* padding-top: 10px; */
-    
+    justify-self: first;  
 }
-
 
 /* CUSTOM SLIDER STYLES  */
 
@@ -516,6 +475,7 @@ input[type=range] {
 	width: 100%;
 }
 
+/* ---- Webkit ---- */
 input[type=range]::-webkit-slider-runnable-track {
 	width: 100%;
 	height: 10px;
@@ -547,6 +507,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
   background: var(--color-dark);
 }
 
+/* ---- Firefox ---- */
 input[type=range]::-moz-range-track {
   width: 100%;
   height: 10px;
@@ -564,6 +525,16 @@ input[type=range]::-moz-range-thumb {
   margin-top: -6.5px; 
 }
 
+input#wetdry-slider::-moz-range-track {
+    background: var(--color-light-grey);     
+}
+
+input#output-slider::-moz-range-track {
+    background: var(--color-light-grey);    
+}
+
+
+/* ---- IE ---- */
 input[type=range]::-ms-track {
   width: 100%;
   height: 10px;
