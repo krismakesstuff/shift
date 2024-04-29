@@ -233,6 +233,127 @@ export function createPresetSelect(parentDiv, presets, presetSelected) {
 // -------  EVENT Callbacks  ------- //
 
 
+// help text variables
+
+// buttons and waveform help text
+let mouseInfoTitle = "INFO: ";
+let micInfo = "Toggle mic input";
+let waveformInfo = "Shows loaded audio file. Drag and drop a file anywhere on the screen to load a new file.";
+let playInfo = "Toggle playback";
+let loopInfo = "Toggle loop playback";
+let recordInfo = "Record audio output to a downloadable file. You'll be prompted to download the file once you stop recording.";
+let presetInfo = "Select a preset. !Not currently working, it's at the top of the list!";
+
+let mixInfo = "Adjust mix parameter. The amount of the effected signal to mix with the dry signal."; 
+let outputInfo = "Adjust output gain. The overall output gain of the device.";
+
+// parameters help text
+let shiftParentInfo = "Adjust pitch shift parameters";
+let lfoParentInfo = "Adjust LFO panner parameters";
+let delayParentInfo = "Adjust delay parameters";
+// shift
+let shiftWindowInfo = "Adjust pitch shift window. Determines how many samples of audio to effect, in milliseconds.";
+let shiftAmountInfo = "Adjust pitch shift amount. The amount of time to shift the window by. (Amount to alter a signal to shift it's pitch)";
+let shiftFeedbackInfo = "Adjust pitch shift feedback amount. The amount of the shifted signal  to feedback through a second stage of shifting. This inherently addes a delay effect.";
+// lfo
+let lfoFreqInfo = "Adjust LFO frequency. The speed of the panning effect, hz";
+let lfoAmountInfo = "Adjust LFO depth. The amount of panning effect added to the shifted signal.";
+// delay
+let delaySendInfo = "Adjust delay send amount. The amount of the signal to send to the delay effect.";
+let delayTimeInfo = "Adjust delay time. The amount of time to delay the signal, in milliseconds.";
+let delayFeedbackInfo = "Adjust delay feedback amount. The amount of the delayed signal to feedback through the delay effect.";
+
+// assign event listener callbacks on appropriate elements. set the help-text from text variables
+
+// attach body mouseover evnt to mouseInfoTitle text 
+document.addEventListener("mouseover", (event) => {
+    if(event.target == document.body) {
+        const mouseInfo = document.getElementById("mouse-info-text");
+        mouseInfo.innerHTML = mouseInfoTitle;
+        console.log("body mouseover");
+    }
+});
+
+// attach button event to help text 
+const buttons = document.getElementsByTagName("button");
+Array.from(buttons).forEach((button) => {
+    button.addEventListener("mouseover", (event) => {
+        const target = event.target;
+        console.log("button mouseover, target: " + target.id);
+        const mouseInfo = document.getElementById("mouse-info-text");
+        if(target.id === "mic-button"){
+            mouseInfo.innerHTML = mouseInfoTitle + micInfo;
+        } else if(target.id === "play-button"){
+            mouseInfo.innerHTML = mouseInfoTitle + playInfo;
+        } else if(target.id === "loop-button"){
+            mouseInfo.innerHTML = mouseInfoTitle + loopInfo;
+        } else if(target.id === "record-button"){
+            mouseInfo.innerHTML = mouseInfoTitle + recordInfo;
+        }
+    });
+});
+
+// waveform mouseover event to help text
+const waveform = document.getElementById("waveform");
+waveform.addEventListener("mouseover", (event) => {
+    console.log("waveform mouseover, target: " + event.target.id);
+    const mouseInfo = document.getElementById("mouse-info-text");
+    mouseInfo.innerHTML = mouseInfoTitle + waveformInfo;
+});
+
+// attach the slider-container's mouseover event to help text
+const sliderContainers = document.getElementsByClassName("slider-container");
+// log slider ids
+console.log("sliderContainers: ");
+console.log(sliderContainers);
+// loop through sliders and add event listener
+Array.from(sliderContainers).forEach((sliderContainer) => {
+    sliderContainer.addEventListener("mouseover", (event) => {
+        console.log("slider mouseover, target: " + event.target.id);
+        const target = event.target;
+        const mouseInfo = document.getElementById("mouse-info-text");
+        if(target.id.includes("shiftwindow")){
+            mouseInfo.innerHTML = mouseInfoTitle + shiftWindowInfo;
+        } else if(target.id.includes("shiftamount")){
+            mouseInfo.innerHTML = mouseInfoTitle + shiftAmountInfo;
+        } else if(target.id.includes("shiftfeedback")){
+            mouseInfo.innerHTML = mouseInfoTitle + shiftFeedbackInfo;
+        } else if(target.id.includes("lfofreq")){
+            mouseInfo.innerHTML = mouseInfoTitle + lfoFreqInfo;
+        } else if(target.id.includes("lfoamount")){
+            mouseInfo.innerHTML = mouseInfoTitle + lfoAmountInfo;
+        } else if(target.id.includes("shiftdelaysend")){
+            mouseInfo.innerHTML = mouseInfoTitle + delaySendInfo;
+        } else if(target.id.includes("delayms")){
+            mouseInfo.innerHTML = mouseInfoTitle + delayTimeInfo;
+        } else if(target.id.includes("delayfeedback")){
+            mouseInfo.innerHTML = mouseInfoTitle + delayFeedbackInfo;
+        } else if (target.id.includes("wetdry")){
+            mouseInfo.innerHTML = mouseInfoTitle + mixInfo;
+        } else if (target.id.includes("output")){
+            mouseInfo.innerHTML = mouseInfoTitle + outputInfo;
+        }
+    });
+});
+
+
+
+
+
+// mouseover event to change mouse-info-text based on hovered element
+document.body.addEventListener("mouseover", (event) => {
+    const target = event.target;
+    const mouseInfo = document.getElementById("mouse-info-text");
+    
+    // find mouseover target and set mouseInfo text
+
+
+
+});
+
+
+
+
 // record button callback
 function recordNewAudioFile() {
     console.log("record button clicked");

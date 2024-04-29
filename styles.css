@@ -17,7 +17,7 @@
 
     --border-radius-small: 4px;
     --border-radius-medium: 8px;
-    --boarder-hover-width: 4px;
+    --border-hover-width: 4px;
 
     --output-button-height: 35px;
 
@@ -32,6 +32,11 @@
 
 * {
     font-family: var(--text-font-family);
+    box-sizing: border-box;
+}
+
+*::before, *::after {
+    box-sizing: border-box;
 }
 
 button:hover {
@@ -66,6 +71,15 @@ label{
     grid-gap: 10px;
     padding-left: var(--parameter-side-padding);
     padding-right: var(--parameter-side-padding);
+
+    border-width: 1px;
+    border-color: transparent;
+    border-radius: var(--border-radius-small);
+    border-style: solid;
+}
+
+.slider-container:hover{
+    border-color: var(--color-light-red) !important;
 }
 
 .slider{
@@ -284,12 +298,12 @@ body{
     grid-column: 2 / 3; 
     background-color: var(--color-light-grey);
     border-radius: var(--border-radius-small);   
-    padding: var(--boarder-hover-width);
+    padding: var(--border-hover-width);
 }
   
 #waveform[data-dragging="true"] {
     border-color: var(--color-light-red);
-    border-width: var(--boarder-hover-width);
+    border-width: var(--border-hover-width);
     border-style: solid;
     padding: 0;
 }   
@@ -297,7 +311,7 @@ body{
 #waveform[data-dragging="false"] {
     border-color: var(--color-light-grey);
     border: none;
-    padding: var(--boarder-hover-width);
+    padding: var(--border-hover-width);
 }
 
 #waveform[data-loading="true"] {
@@ -317,49 +331,6 @@ body{
     background-color: var(--color-dark-transparent);
     border-radius: var(--border-radius-small);
     padding: 10px;
-}
-
-#parameters-section {
-    display: grid;
-    grid-area: "parameters-section";
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr;
-    grid-gap: 100px;
-    padding-left: var(--side-padding);
-    padding-right: var(--side-padding);
-    padding-bottom: var(--vertical-padding);
-    background-color: var(--color-dark);
-}
-
-.parameter-label {
-    color: var(--color-dark);
-    font-size: var(--text-size-large);
-    font-weight: bold;
-    align-self: end;
-    justify-self: start;
-    padding-left: 10px;
-}
-
-.parameter-parent {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 40px 1fr 1fr 1fr;
-    grid-gap: 3px;
-    padding: 10px;
-    background-color: var(--color-light-grey);    
-    border-radius: var(--border-radius-small);
-}
-
-#output-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 2fr;
-    grid-gap: 10px 40px;
-    padding-left: var(--side-padding);
-    padding-right: var(--side-padding);
-    padding-top: var(--vertical-padding);
-    padding-bottom: var(--vertical-padding);
-    background-color: var(--color-dark);
 }
 
 #playback-container{
@@ -417,10 +388,21 @@ body{
     border-radius: var(--border-radius-small);
 }
 
+#output-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 2fr;
+    grid-gap: 10px 100px;
+    padding-left: var(--side-padding);
+    padding-right: var(--side-padding);
+    padding-top: var(--vertical-padding);
+    padding-bottom: var(--vertical-padding);
+    background-color: var(--color-dark);
+}
+
 #output{
     color: var(--color-light-grey);
     grid-row: 2 / 3;
-
 }
 
 #output-slider-display{
@@ -465,6 +447,51 @@ body{
     align-self: center;
     justify-self: first;  
 }
+
+
+#parameters-section {
+    display: grid;
+    grid-area: "parameters-section";
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-gap: 100px;
+    padding-left: var(--side-padding);
+    padding-right: var(--side-padding);
+    padding-bottom: var(--vertical-padding);
+    background-color: var(--color-dark);
+}
+
+.parameter-label {
+    color: var(--color-dark);
+    font-size: var(--text-size-large);
+    font-weight: bold;
+    align-self: end;
+    justify-self: center;
+    padding-left: 10px;
+}
+
+.parameter-parent {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 40px 1fr 1fr 1fr;
+    grid-gap: 3px;
+    padding: 10px;
+    background-color: var(--color-light-grey);    
+    border-radius: var(--border-radius-small);
+}
+
+#mouse-info-container{
+    display: grid;
+    padding-left: var(--side-padding);
+    padding-top: 10px;
+}
+
+#mouse-info-text{
+    font-family: var(--text-font-family);
+    font-size: var(--text-size-small);
+    color: var(--color-light-white);
+}
+
 
 /* CUSTOM SLIDER STYLES  */
 
