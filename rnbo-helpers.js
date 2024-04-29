@@ -9,6 +9,7 @@
 import { createPresetSelect, presetSelected, updateSliders } from "./uiBuilders.js";
 import { downloadNewRecording } from './uiBuilders.js';
 export const patchExportURL = "rnbo-export/shift.export.json";
+import { bufferToWave } from './uiBuilders.js';
 
 let response, patcher;
 export var presets;
@@ -70,18 +71,15 @@ export async function createRNBODevice(patchExportURL) {
     // connect gain node to recorder
     let streamDestination = context.createMediaStreamDestination();
     let options = {
-        mimeType: 'audio/mpeg',
+        mimeType: 'audio/webm;codecs=pcm',
     }
-    mediaRecorder = new MediaRecorder(streamDestination.stream);
+    mediaRecorder = new MediaRecorder(streamDestination.stream, options);
 
+    
     const types = [
-        "video/webm",
         "audio/webm",
-        "video/webm;codecs=vp8",
-        "video/webm;codecs=daala",
-        "video/webm;codecs=h264",
+        "audio/webm;codecs=pcm",
         "audio/webm;codecs=opus",
-        "video/mp4",
         "audio/mpeg", 
         "audio/wav",
     ];
@@ -97,9 +95,8 @@ export async function createRNBODevice(patchExportURL) {
 
     // Media Recorder Event onstart
     mediaRecorder.onstart = function(e) {
-
         console.log("recording started");
-        
+        console.log("Recording format: " + mediaRecorder.mimeType);
 
         recordedBlob = [];
     }
@@ -114,21 +111,39 @@ export async function createRNBODevice(patchExportURL) {
     mediaRecorder.onstop = function(e) {
         console.log("recording stopped");
         console.log(recordedBlob);
-        let blob = new Blob(recordedBlob, { type: 'audio/mpeg' }); 
-        console.log("new blob...");
-        console.log(blob);
-
-
-        let downloadLink = document.getElementById("download-link"); 
-        let fileName = "shift-recording-" + (Date.now() - date) + ".mp3";
-        let url = URL.createObjectURL(blob);
         
-        downloadLink.href =url;  
-        downloadLink.download = fileName;
 
-        //downloadLink.click();
+        const reader = new FileReader();
+        //let arrayBuffer;
 
-        //downloadNewRecording(blob);
+        // returns and array buffer
+        reader.onloadend = function() {
+            console.log("FileReader onloadend");
+            console.log(reader.result);
+            //arrayBuffer = reader.result;
+
+            // decode audio data
+            context.decodeAudioData(reader.result, function(audioBuffer) {
+                console.log("Decoded audio data");
+                const waveBlob = bufferToWave(audioBuffer, audioBuffer.length);
+
+                let url = URL.createObjectURL(waveBlob);
+                console.log("waveBlob url: " + url);
+                let downloadLink = document.getElementById("download-link"); 
+                let fileName = "shift-recording-" + (Date.now() - date);
+                
+                downloadLink.href = url;  
+                downloadLink.download = fileName;
+                downloadLink.click();
+
+            }, function(e){"Error with decoding audio data" + e.err});
+
+        }
+
+        // reads blob as an ArrayBuffer
+        reader.readAsArrayBuffer(recordedBlob[0]);
+
+        
     }
 
     // connect gain node to recorder
