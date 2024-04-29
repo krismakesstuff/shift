@@ -1,12 +1,6 @@
 console.log('main.js');
 
 import { createRNBODevice, patchExportURL, device, context } from './rnbo-helpers.js';
-import { updateSliders } from './uiBuilders.js';
-
-let bufferDescs;
-
-const sampleRate = 44100;
-const numChans = 2;
 
 var droppedFile;
 var getDroppedFile = false;
@@ -77,19 +71,10 @@ export function toggleMicInput(){
 
 
 // File drop zone, adding and defining event listeners
-
 document.addEventListener("dragover", dragOverHandler, false);
 document.addEventListener("dragleave", dragLeaveHandler, false);    
 document.addEventListener("drop", dropHandler, false);
 
-// ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-//     document.addEventListener(eventName, preventDefaults, false)
-//   })
-  
-function preventDefaults (e) {
-    e.preventDefault()
-    e.stopPropagation()
-}
 
 function dragOverHandler(ev) {
     console.log("File(s) in drop zone");
@@ -126,7 +111,7 @@ function dropHandler(ev) {
             if (item.kind === "file") {
                 const file = item.getAsFile();
                 console.log(`file found: file[${i}].name = ${file.name}`);
-                // check if file is audio file and insert audio player if it is
+                // check if file is audio file and flip getDroppedFile flag
                 if(file.type.startsWith("audio")){
                     
                     droppedFile = file;
@@ -141,10 +126,7 @@ function dropHandler(ev) {
     } else {
         // Use DataTransfer interface to access the file(s)
         [...ev.dataTransfer.files].forEach((file, i) => {
-            
             console.log(`not a file?? file[${i}].name = ${file.name}`);
-
-            
         });
     }
 
@@ -152,8 +134,6 @@ function dropHandler(ev) {
     const waveform = document.getElementById("waveform");
     waveform.setAttribute("data-dragging", "false");
 }
-
-
 
 
 // if getDropFile is true, load audio file into buffers
@@ -172,13 +152,10 @@ function loadDroppedFile(){
     }
 }
 
-
-
-// timer to check if file has been dropped
+// timer to check if a new file has been dropped
 setInterval(loadDroppedFile, 1000); 
 
-
-
+// udpates wavesurfer with new audio file
 function updateWaveform(file){
 
     // update audio element src
@@ -190,7 +167,7 @@ function updateWaveform(file){
     wavesurfer.load(url);
 }
 
-
+// create wavesurfer and connect it to the audio element
 function createWaveform(buffer, file){
     console.log("creating waveform");
     if(device){
@@ -246,9 +223,6 @@ function createWaveform(buffer, file){
                 playButton.click();
             }
         })
-
-        
-
     }
 };
 

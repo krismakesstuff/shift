@@ -1,17 +1,14 @@
 
-// This js file was made by Sam Tarakajian and is used to create a device and load the patcher from the exported json file.
-// As well as functions to play and stop notes.
-// I modified parts of this file to work with my project, like adding offline context
+// This js file was adapted from a helper file made by Sam Tarakajian and is used to create a device and load the patcher from the exported json file.
+// I modified parts of this file to work with my project, such as adding a media recorder.
 // see: https://rnbo.cycling74.com/learn/loading-a-rnbo-device-in-the-browser-js
 // see: https://youtu.be/l42_f9Ir8fQ?si=_1eSUs2Ipbc8S9cu
 
 
 import { createPresetSelect, presetSelected, updateSliders } from "./uiBuilders.js";
-import { downloadNewRecording } from './uiBuilders.js';
 export const patchExportURL = "rnbo-export/shift.export.json";
 import { bufferToWave } from './uiBuilders.js';
 
-let response, patcher;
 export var presets;
 let defaultPreset = "default"; // set to the name of the preset you want to load by
 
@@ -22,11 +19,12 @@ export const context = new WAContext();
 export let outputGainNode = context.createGain();
 
 export let mediaRecorder;
-
+// get date for timestamping recordings
 let date = Date.now();
 console.log("Date now: " + date);
 let recordedBlob = [];
 
+// check if browser is safari
 var isSafari = window.safari !== undefined;
 if (isSafari){
     console.log("Safari, yeah!");
@@ -34,10 +32,15 @@ if (isSafari){
     console.log("Not Safari");
 } 
 
+// check if browser is firefox
+let isFirefox = navigator.userAgent.indexOf("Firefox") > -1; 
+if(isFirefox){
+    console.log("Firefox, yeah!");
+} else {
+    console.log("Not Firefox");
+}
 
 export async function createRNBODevice(patchExportURL) {
-    
-    
     // Fetch the exported patcher
     let response, patcher;
     try {
@@ -79,12 +82,17 @@ export async function createRNBODevice(patchExportURL) {
     // connect gain node to recorder
     let streamDestination = context.createMediaStreamDestination();
 
-
+    // recording options
     let options; 
 
+    // we use the supported mimeType for each browser
     if (isSafari) {
         options = {
             mimeType: "audio/mp4",
+        };
+    } else if (isFirefox) {
+        options = {
+            mimeType: 'audio/ogg',
         };
     } else {
         options = {
@@ -92,32 +100,11 @@ export async function createRNBODevice(patchExportURL) {
         };
     }
 
-    // let options = {
-    //     mimeType: 'audio/webm;codecs=pcm',
-    // }
+    // log supported recording types
+    checkForMediaRecorderSupport();
     
-    const types = [
-        "audio/webm",
-        "audio/webm;codecs=pcm",
-        "audio/webm;codecs=opus",
-        "audio/mpeg", 
-        "audio/wav",
-        "audio/aac",
-        "audio/mp4",
-    ];
-      
-    for (const type of types) {
-        console.log(
-            `Is ${type} supported? ${
-            MediaRecorder.isTypeSupported(type) ? "Yes!" : "Nope :("
-            }`,
-        );
-    }
-    
+    // create media recorder with stream destination and options
     mediaRecorder = new MediaRecorder(streamDestination.stream, options);
-
-    
-      
 
     // Media Recorder Event onstart
     mediaRecorder.onstart = function(e) {
@@ -133,59 +120,58 @@ export async function createRNBODevice(patchExportURL) {
         recordedBlob.push(e.data);
     }
 
-    // Media Recorder Event onstop
+    // Media Recorder Event onstop, happens after a final ondataavailable event
     mediaRecorder.onstop = function(e) {
         console.log("recording stopped");
         console.log(recordedBlob);
-        
-        if (mediaRecorder.mimeType == "audio/mp4"){
-            let mp4Blob = new Blob(recordedBlob, {type: "audio/mp4"});
-            let url = URL.createObjectURL(mp4Blob);
-
-            let downloadLink = document.getElementById("download-link");
-            let fileName = "shift-recording-" + (Date.now() - date);
-
-            downloadLink.href = url;  
-            downloadLink.download = fileName;
-            downloadLink.click();
-        }
-        else {
-
-            const reader = new FileReader();
     
+        
+        // create url for download, based off mimetype
+        if (mediaRecorder.mimeType == "audio/mp4"){
+            // create an mp4 file
+            let mp4Blob = new Blob(recordedBlob, {type: "audio/mp4"});
+            const url = URL.createObjectURL(mp4Blob);
+            console.log("mp4Blob url: " + url);
+            // download the file
+            updateDownloadLink(url);
+            
+        } else if (mediaRecorder.mimeType == "audio/ogg"){
+            // create an ogg file
+            let oggBlob = new Blob(recordedBlob, {type: "audio/ogg"});
+            const url = URL.createObjectURL(oggBlob);
+            console.log("oggBlob url: " + url);
+            // download the file
+            updateDownloadLink(url);
+
+        } else {
+            // create a wav file
+            const reader = new FileReader();
             // returns and array buffer
             reader.onloadend = function() {
                 console.log("FileReader onloadend");
                 console.log(reader.result);
-    
-                // decode audio data
+                
+                // decode arrayBuffer to audioBuffer
                 context.decodeAudioData(reader.result, function(audioBuffer) {
                     console.log("Decoded audio data");
-
-                    // writes the wave header for file
-                    const waveBlob = bufferToWave(audioBuffer, audioBuffer.length);
-    
-                    let url = URL.createObjectURL(waveBlob);
-                    console.log("waveBlob url: " + url);
-                    let downloadLink = document.getElementById("download-link"); 
-                    let fileName = "shift-recording-" + (Date.now() - date);
                     
-                    // downloads the file
-                    downloadLink.href = url;  
-                    downloadLink.download = fileName;
-                    downloadLink.click();
-    
+                    // writes the wave header to the audiobuffer and returns a blob of audio/wav type
+                    const waveBlob = bufferToWave(audioBuffer, audioBuffer.length);
+                    const url = URL.createObjectURL(waveBlob);
+                    console.log("waveBlob url: " + url);
+                    
+                    // download the file
+                    updateDownloadLink(url);
+                    
                 }, function(e){"Error with decoding audio data" + e.err});
-    
+                
             }
-    
+            
             // reads blob as an ArrayBuffer
             reader.readAsArrayBuffer(recordedBlob[0]);
         }
-
-        
     }
-
+    
     // connect gain node to recorder
     outputGainNode.connect(streamDestination);
     
@@ -214,7 +200,7 @@ export async function createRNBODevice(patchExportURL) {
     device.setPreset(presets[0].preset);
 
     // update sliders
-
+    // TODO: presets not working properly... 
 
     // Create a preset select element in the output section
     let outputSection = document.getElementById("output-section");
@@ -225,7 +211,6 @@ export async function createRNBODevice(patchExportURL) {
 }
 
 
-        
 function loadRNBOScript(version) {
     return new Promise((resolve, reject) => {
         if (/^\d+\.\d+\.\d+-dev$/.test(version)) {
@@ -242,3 +227,32 @@ function loadRNBOScript(version) {
     });
 }
 
+// check for supported media recorder types
+function checkForMediaRecorderSupport(){
+    const types = [
+        "audio/webm",
+        "audio/webm;codecs=pcm",
+        "audio/webm;codecs=opus",
+        "audio/mpeg", 
+        "audio/wav",
+        "audio/aac",
+        "audio/mp4",
+        "audio/ogg",
+    ];
+      
+    for (const type of types) {
+        console.log(
+            `Is ${type} supported? ${
+            MediaRecorder.isTypeSupported(type) ? "Yes!" : "Nope :("
+            }`,
+        );
+    }
+}
+
+// update download link with url and download file
+function updateDownloadLink(url){
+    let downloadLink = document.getElementById("download-link");
+    downloadLink.href = url;
+    downloadLink.download = "shift-recording-" + (Date.now() - date);
+    downloadLink.click();
+}

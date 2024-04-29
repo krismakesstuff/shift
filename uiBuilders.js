@@ -10,8 +10,9 @@ import { outputGainNode } from "./rnbo-helpers.js";
 
 
 // -------  UI Elements  ------- //
+// This section defines the UI elements and their parent containers. See UI BUILDERS section for implementation
 
-// create and add Toggle Buttons for play and loop 
+// INPUT SECTION ------ 
 let inputSection = document.getElementById("input-section");
 
 let micSection = document.createElement("div");
@@ -27,24 +28,24 @@ micSection.appendChild(micLabel);
 
 inputSection.appendChild(micSection);
 
-// output section parameters
+// OUTPUT SECTION ------
 let outputDiv = document.getElementById("output-section");
 // output sliders and print button
 createSlider(outputDiv, "mix", "wetdry", 0, 1.0, 0.01, sliderCallback);
 createSlider(outputDiv, "output", "output", 0, 1.0, 0.01, sliderCallback);
-
+// playback buttons container
 let playBackDiv = document.createElement("div");
 playBackDiv.id = "playback-container";
 outputDiv.appendChild(playBackDiv);
 // buttons
-
-
 createToggleButton(playBackDiv, "play", buttonCallback);
 createToggleButton(playBackDiv, "loop", buttonCallback);
 createRecordButton(playBackDiv, "record");
 
 
-// create Parent Divs for parameters
+// PARAMETERS SECTION ------
+const parametersSection = document.getElementById("parameters-section");
+
 const shiftParentDiv = document.createElement("div");  
 shiftParentDiv.className = "parameter-parent";  
 shiftParentDiv.id = "shift-parent";
@@ -58,12 +59,11 @@ lfoParentDiv.className = "parameter-parent";
 lfoParentDiv.id = "lfo-parent";
 
 // Insert the parent divs into the parameters-section element
-const parametersSection = document.getElementById("parameters-section");
 parametersSection.appendChild(shiftParentDiv);
 parametersSection.appendChild(lfoParentDiv);
 parametersSection.appendChild(delayParentDiv);
 
-// create sliders
+// create sliders and labels for each parameter
 
 // shift label
 let shiftLabel = document.createElement("div");
@@ -116,17 +116,15 @@ function createRecordButton(parentDiv, name) {
 
     // set data-recording attribute to false
     button.dataset.recording = "false"; 
-    
     button.addEventListener("click", () => { recordNewAudioFile(); });
 
     // Insert the button into the output element
-    //const outputSection = document.getElementById("output-section");
     outerDiv.appendChild(button);
     parentDiv.appendChild(outerDiv);
 }
 
 
-// creates slider with given parameters and adds to section2
+// creates slider with given parameters 
 function createSlider(parentDiv, displayName, paramID, min, max, step, callback) {
     // create outer div
     const outerDiv = document.createElement("div");
@@ -164,15 +162,14 @@ function createSlider(parentDiv, displayName, paramID, min, max, step, callback)
         // update slider
         slider.value = input.value;
         // update rnbo parameter
-        updateParamValue(name, input.value);
+        updateParamValue(paramID, input.value);
     });
 
-    // Insert the slider and label into the parameters-section element
-    const parametersSection = document.getElementById("parameters-section");
+        
     outerDiv.appendChild(label);
     outerDiv.appendChild(input);
     outerDiv.appendChild(slider);
-//    parametersSection.appendChild(outerDiv);
+
     parentDiv.appendChild(outerDiv);
 }
 
@@ -190,11 +187,7 @@ function createToggleButton(parentDiv, name, callback) {
     button.textContent = name;
     button.addEventListener("click", callback);
 
-    // Insert the button into the section2 element
-    //const fileSection = document.getElementById("file-section");
     outerDiv.appendChild(button);
-    //fileSection.appendChild(outerDiv);
-    //parentDiv.insertBefore(outerDiv, fileSection.firstChild);
     parentDiv.appendChild(outerDiv);
 }
 
@@ -270,42 +263,6 @@ function recordNewAudioFile() {
 }
 
 
-
-export function downloadNewRecording(blob) {
-
-    let downloadLink = document.getElementById("download-link"); 
-    const file = new File([blob], fileName, {type: 'audio/wav'});   
-    let url = URL.createObjectURL(file);
-
-    console.log("url: " + url);
-    const fr = new FileReader();
-
-    fr.readAsDataURL(blob);
-
-    fr.onload = function() {
-        console.log("file made, reading.. ");
-        const result = fr.result;
-
-        console.log(result);
-        //console.log("result data url: " + result.data.url);
-
-        downloadLink.href = url;
-        downloadLink.download = fileName;
-        downloadLink.click();
-        
-    }
-
-
-    // console.log("new file..");
-    // console.log(file);
-
-    // downloadLink.href = url;
-    // downloadLink.download = fileName;
-    // downloadLink.click();
-
-}   
-
-
 // preset select callback
 export function presetSelected() {
     console.log("preset selected");
@@ -370,8 +327,8 @@ function updatePresets(presets) {
 
 }
 
-// callback for all sliders, uses slider id to determine which parameter to set
-// reference createSlider() function for slider id naming convention
+// callback for all sliders, uses slider id to determine which parameter to set.
+// reference the createSlider() function for slider id naming convention
 function sliderCallback() {
     const sliderId = this.id;
     const sliderValue = this.value;
@@ -413,8 +370,6 @@ function buttonCallback() {
     let newState = this.dataset.state;
 
     // get button state and toogle
-    
-
     if(paramId == "mic"){   
         toggleMicInput();
     } else if(paramId == "play"){
@@ -452,14 +407,9 @@ function toggleLoopButton(newState) {
     } else {
         loopButton.innerHTML = "loop";
     }
-
-    
 }
 
 // -------  Helper Functions  ------- //
-
-
-
 
 // vvvv  NOT MY CODE vvvv
 // Credit to: https://russellgood.com/how-to-convert-audiobuffer-to-audio-file/
