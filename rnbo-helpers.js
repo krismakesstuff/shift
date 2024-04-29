@@ -151,13 +151,12 @@ export async function createRNBODevice(patchExportURL) {
         }
 
         const reader = new FileReader();
-        //let arrayBuffer;
+
 
         // returns and array buffer
         reader.onloadend = function() {
             console.log("FileReader onloadend");
             console.log(reader.result);
-            //arrayBuffer = reader.result;
 
             // decode audio data
             context.decodeAudioData(reader.result, function(audioBuffer) {
