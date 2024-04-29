@@ -1,6 +1,7 @@
 console.log('main.js');
 
 import { createRNBODevice, patchExportURL, device, context } from './rnbo-helpers.js';
+import { updateSliders } from './uiBuilders.js';
 
 var droppedFile;
 var getDroppedFile = false;
@@ -17,6 +18,7 @@ async function setupRNBO() {
         await createRNBODevice(patchExportURL);
         console.log("RNBO Device Created");
         createWaveform();
+        updateSliders();
 
     } catch (err) {
         console.log("Error creating RNBO device");
@@ -32,7 +34,11 @@ async function setupRNBO() {
 // if device and context have been assigned
 setupRNBO();
 
-
+// window load event listener
+window.addEventListener("load", (event) => {
+    console.log("window loaded");
+    
+});
 
 
 // min input functions 

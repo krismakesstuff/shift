@@ -4,6 +4,7 @@
 // see: https://rnbo.cycling74.com/learn/loading-a-rnbo-device-in-the-browser-js
 // see: https://youtu.be/l42_f9Ir8fQ?si=_1eSUs2Ipbc8S9cu
 
+console.log("rnbo-helpers.js loading...");
 
 import { createPresetSelect, presetSelected, updateSliders } from "./uiBuilders.js";
 export const patchExportURL = "rnbo-export/shift.export.json";
@@ -196,17 +197,19 @@ export async function createRNBODevice(patchExportURL) {
         
     }
 
-    // Set the default preset
-    device.setPreset(presets[0].preset);
-
-    // update sliders
+    
     // TODO: presets not working properly... 
-
+    
     // Create a preset select element in the output section
     let outputSection = document.getElementById("output-section");
-    createPresetSelect(outputSection, presets, presetSelected);
-    // set the default preset
-    //selectElement.value = 1;
+    let selectElement  = createPresetSelect(outputSection, presets, presetSelected);
+    
+    // Set the default preset
+    device.setPreset(presets[0].preset);
+    selectElement.value = defaultPreset;
+    
+    // update sliders
+    //updateSliders();
     
 }
 

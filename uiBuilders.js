@@ -72,7 +72,7 @@ shiftLabel.id = "shift-label";
 shiftLabel.innerHTML = "SHIFT";
 shiftParentDiv.appendChild(shiftLabel);
 // shift parameters
-createSlider(shiftParentDiv, "window", "shiftwindow", 0, 1000, 0.001, sliderCallback);
+createSlider(shiftParentDiv, "window-ms", "shiftwindow", 0, 1000, 0.001, sliderCallback);
 createSlider(shiftParentDiv, "amount", "shiftamount", 0, 10, 0.01, sliderCallback);
 createSlider(shiftParentDiv, "feedback", "shiftfeedback", 0.001, 0.8, 0.001, sliderCallback);
 
@@ -83,7 +83,7 @@ lfoLabel.id = "lfo-label";
 lfoLabel.innerHTML = "LFO PANNER";
 lfoParentDiv.appendChild(lfoLabel); 
 // lfo parameters
-createSlider(lfoParentDiv, "frequency", "lfofreq", 0, 15, 0.01, sliderCallback); 
+createSlider(lfoParentDiv, "frequency-hz", "lfofreq", 0, 15, 0.01, sliderCallback); 
 createSlider(lfoParentDiv, "depth", "lfoamount", 0, 1.0, 0.001, sliderCallback);  
 
 // delay label
@@ -93,8 +93,8 @@ delayLabel.id = "delay-label";
 delayLabel.innerHTML = "DELAY";
 delayParentDiv.appendChild(delayLabel);
 // delay parameters
-createSlider(delayParentDiv, "amount", "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
 createSlider(delayParentDiv, "time-ms", "delayms", 0, 2000, 0.1, sliderCallback);  
+createSlider(delayParentDiv, "amount", "shiftdelaysend", 0, 1.0, 0.01, sliderCallback);
 createSlider(delayParentDiv, "feedback", "delayfeedback", 0, 1.0, 0.001, sliderCallback);
 
 
@@ -196,7 +196,7 @@ export function createPresetSelect(parentDiv, presets, presetSelected) {
     
     // create outer div
     const outerDiv = document.createElement("div");
-    outerDiv.className = "preset-select-container"; 
+    outerDiv.id = "preset-select-container"; 
 
     // create a label for the select
     const label = document.createElement("label");
@@ -218,12 +218,15 @@ export function createPresetSelect(parentDiv, presets, presetSelected) {
 
         select.appendChild(option);
     });
-
-    // select the default preset
-    //select.selectedIndex = 0;
     
+    // attach help text to mouseover event
+    outerDiv.addEventListener("mouseover", (event) => {
+        //console.log("preset select mouseover, target: " + event.target.id);
+        const mouseInfo = document.getElementById("mouse-info-text");
+        mouseInfo.innerHTML = mouseInfoTitle + presetInfo;
+    });
+
     outerDiv.appendChild(select);
-    //parentDiv.appendChild(outerDiv);
     parentDiv.insertBefore(outerDiv, parentDiv.firstChild);
 
     return select;
@@ -236,51 +239,41 @@ export function createPresetSelect(parentDiv, presets, presetSelected) {
 // help text variables
 
 // buttons and waveform help text
-let mouseInfoTitle = "INFO: ";
-let micInfo = "Toggle mic input";
-let waveformInfo = "Shows loaded audio file. Drag and drop a file anywhere on the screen to load a new file.";
-let playInfo = "Toggle playback";
-let loopInfo = "Toggle loop playback";
-let recordInfo = "Record audio output to a downloadable file. You'll be prompted to download the file once you stop recording.";
-let presetInfo = "Select a preset. !Not currently working, it's at the top of the list!";
+let mouseInfoTitle = "";
 
-let mixInfo = "Adjust mix parameter. The amount of the effected signal to mix with the dry signal."; 
-let outputInfo = "Adjust output gain. The overall output gain of the device.";
+let micInfo = "MIC: Toggle mic input";
+let waveformInfo = "WAVEFORM: Shows loaded audio file. Drag and drop a file anywhere on the screen to load a new file.";
+let playInfo = "PLAY: Toggle playback";
+let loopInfo = "LOOP: Toggle loop playback";
+let recordInfo = "RECORD: Records audio output to a downloadable file. You'll be prompted to download the file once you stop recording.";
+let presetInfo = "PRESET: Select a preset... NOT CURRENTLY WORKING!. It's at the top of the list!";
 
-// parameters help text
-let shiftParentInfo = "Adjust pitch shift parameters";
-let lfoParentInfo = "Adjust LFO panner parameters";
-let delayParentInfo = "Adjust delay parameters";
+let mixInfo = "MIX: The amount of the effected signal to mix with the uneffected signal."; 
+let outputInfo = "OUTPUT: The overall output gain sent to your speakers";
+
+// parameters 
+
 // shift
-let shiftWindowInfo = "Adjust pitch shift window. Determines how many samples of audio to effect, in milliseconds.";
-let shiftAmountInfo = "Adjust pitch shift amount. The amount of time to shift the window by. (Amount to alter a signal to shift it's pitch)";
-let shiftFeedbackInfo = "Adjust pitch shift feedback amount. The amount of the shifted signal  to feedback through a second stage of shifting. This inherently addes a delay effect.";
+let shiftWindowInfo = "SHIFT WINDOW: Determines how many samples of audio to effect, in milliseconds.";
+let shiftAmountInfo = "SHIFT AMOUNT: The amount of time to shift the window by. (pitch shift)";
+let shiftFeedbackInfo = "SHIFT FEEDBACK: The amount of the shifted signal to feedback through a second stage of shifting. This inherently addes a delay effect.";
 // lfo
-let lfoFreqInfo = "Adjust LFO frequency. The speed of the panning effect, hz";
-let lfoAmountInfo = "Adjust LFO depth. The amount of panning effect added to the shifted signal.";
+let lfoFreqInfo = "LFO FREQUENCY: The speed of the panning effect, in hz.";
+let lfoAmountInfo = "LFO DEPTH: The amount of panning effect added to the shifted signal.";
 // delay
-let delaySendInfo = "Adjust delay send amount. The amount of the signal to send to the delay effect.";
-let delayTimeInfo = "Adjust delay time. The amount of time to delay the signal, in milliseconds.";
-let delayFeedbackInfo = "Adjust delay feedback amount. The amount of the delayed signal to feedback through the delay effect.";
+let delaySendInfo = "DELAY SEND AMOUNT: The amount of the signal to send to the delay effect.";
+let delayTimeInfo = "DELAY TIME. The amount of time to delay the signal, in milliseconds. (ping-pong delay)";
+let delayFeedbackInfo = "DELAY FEEDBACK: The amount of the delayed signal to feedback through the delay effect.";
 
-// assign event listener callbacks on appropriate elements. set the help-text from text variables
-
-// attach body mouseover evnt to mouseInfoTitle text 
-document.addEventListener("mouseover", (event) => {
-    if(event.target == document.body) {
-        const mouseInfo = document.getElementById("mouse-info-text");
-        mouseInfo.innerHTML = mouseInfoTitle;
-        console.log("body mouseover");
-    }
-});
 
 // attach button event to help text 
 const buttons = document.getElementsByTagName("button");
 Array.from(buttons).forEach((button) => {
     button.addEventListener("mouseover", (event) => {
         const target = event.target;
-        console.log("button mouseover, target: " + target.id);
+        //console.log("button mouseover, target: " + target.id);
         const mouseInfo = document.getElementById("mouse-info-text");
+
         if(target.id === "mic-button"){
             mouseInfo.innerHTML = mouseInfoTitle + micInfo;
         } else if(target.id === "play-button"){
@@ -296,7 +289,7 @@ Array.from(buttons).forEach((button) => {
 // waveform mouseover event to help text
 const waveform = document.getElementById("waveform");
 waveform.addEventListener("mouseover", (event) => {
-    console.log("waveform mouseover, target: " + event.target.id);
+    //console.log("waveform mouseover, target: " + event.target.id);
     const mouseInfo = document.getElementById("mouse-info-text");
     mouseInfo.innerHTML = mouseInfoTitle + waveformInfo;
 });
@@ -304,12 +297,12 @@ waveform.addEventListener("mouseover", (event) => {
 // attach the slider-container's mouseover event to help text
 const sliderContainers = document.getElementsByClassName("slider-container");
 // log slider ids
-console.log("sliderContainers: ");
-console.log(sliderContainers);
+//console.log("sliderContainers: ");
+//console.log(sliderContainers);
 // loop through sliders and add event listener
 Array.from(sliderContainers).forEach((sliderContainer) => {
     sliderContainer.addEventListener("mouseover", (event) => {
-        console.log("slider mouseover, target: " + event.target.id);
+        //console.log("slider mouseover, target: " + event.target.id);
         const target = event.target;
         const mouseInfo = document.getElementById("mouse-info-text");
         if(target.id.includes("shiftwindow")){
@@ -334,21 +327,6 @@ Array.from(sliderContainers).forEach((sliderContainer) => {
             mouseInfo.innerHTML = mouseInfoTitle + outputInfo;
         }
     });
-});
-
-
-
-
-
-// mouseover event to change mouse-info-text based on hovered element
-document.body.addEventListener("mouseover", (event) => {
-    const target = event.target;
-    const mouseInfo = document.getElementById("mouse-info-text");
-    
-    // find mouseover target and set mouseInfo text
-
-
-
 });
 
 
@@ -410,19 +388,20 @@ export function presetSelected() {
 export function updateSliders() {
 
     let sliders = document.getElementsByClassName("slider");
-
+    console.log("sliders--");
+    console.log(sliders);
     for(let i = 0; i < sliders.length; i++){
         let element = sliders.item(i);   
         const paramId = element.id.replace('-slider', '');
         if(paramId == "output") {
             return;
+        } else {
+            const param = device.parametersById.get(paramId);
+            console.log(`updating slider ${paramId} to ${param.value}`);
+            element.value = param.value;
+            const input = document.getElementById(element.id + "-display");
+            input.value = param.value;
         }
-
-        const param = device.parametersById.get(paramId);
-        console.log(`updating slider ${paramId} to ${param.value}`);
-        element.value = param.value;
-        const input = document.getElementById(element.id + "-display");
-        input.value = param.value;
     };
 }
 

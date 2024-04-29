@@ -424,14 +424,23 @@ body{
     color: var(--color-light-grey);
 }
 
-.preset-select-container{
+#preset-select-container{
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 25px 50px;
     grid-row: 2/3;
     grid-column: 1 /2;
     padding-right: 35px;
+
+    /* border-width: 1px;
+    border-color: transparent;
+    border-radius: var(--border-radius-small);
+    border-style: solid; */
 }
+
+/* #preset-select-container:hover{
+    border-color: var(--color-light-red) !important;
+} */
 
 #preset-label{
     grid-row: 1/ 2;
@@ -488,8 +497,8 @@ body{
 
 #mouse-info-text{
     font-family: var(--text-font-family);
-    font-size: var(--text-size-small);
-    color: var(--color-light-white);
+    font-size: var(--text-size-normal);
+    color: var(--color-light-grey);
 }
 
 
